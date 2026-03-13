@@ -161,8 +161,8 @@ function renderMatches(group) {
         // 兼容多種表頭命名方式
         const date = getSafeValue(item, ['日期', '比賽日期']);
         const time = excelTimeToHHMM(getSafeValue(item, ['時間', '比賽時間']));
-        const teamA = getSafeValue(item, ['隊伍A', '對賽隊伍A', '參賽隊伍A']);
-        const teamB = getSafeValue(item, ['隊伍B', '對賽隊伍B', '參賽隊伍B']);
+        const teamA = item['隊伍A'] || '-';
+        const teamB = item['隊伍B'] || '-';
         const venue = getSafeValue(item, ['場地', '比賽場地']);
         const subgroup = getSafeValue(item, ['組別', '小組']);
         
