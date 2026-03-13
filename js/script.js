@@ -40,9 +40,10 @@ function getSafeValue(item, keys) {
 // ========== 數據加載 ==========
 // 加載Excel數據
 function loadExcelData() {
-    fetch(DATA_FILE_PATH)
+    // 添加時間戳禁用緩存
+    fetch(DATA_FILE_PATH + '?t=' + new Date().getTime())
         .then(response => {
-            if (!response.ok) throw new Error('加載數據文件失敗');
+            if (!response.ok) throw new Error('加載數據文件失敗，狀態碼：' + response.status);
             return response.arrayBuffer();
         })
         .then(data => {
@@ -54,6 +55,10 @@ function loadExcelData() {
                 const worksheet = workbook.Sheets[sheetName];
                 excelData[sheetName] = XLSX.utils.sheet_to_json(worksheet);
             });
+
+            // 控制台日誌（排查用）
+            console.log('✅ Excel工作表列表：', workbook.SheetNames);
+            console.log('✅ 初級組對賽安排數據：', excelData['初級組_對賽安排']);
             
             // 更新最後更新時間
             document.getElementById('update-time').textContent = new Date().toLocaleString('zh-Hant-MO');
@@ -64,10 +69,10 @@ function loadExcelData() {
             renderRankings('初級組');
         })
         .catch(error => {
-            console.error('加載數據錯誤:', error);
+            console.error('❌ 加載數據錯誤:', error);
             // 顯示錯誤信息
             document.querySelectorAll('.tab-content').forEach(content => {
-                content.innerHTML = `<div class="loading">加載數據失敗，請檢查文件路徑或格式</div>`;
+                content.innerHTML = `<div class="loading">加載數據失敗：${error.message}</div>`;
             });
         });
 }
