@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 綁定選項卡點擊事件
     bindTabEvents();
+
+    // 綁定頂部導航欄點擊事件
+    bindNavEvents();
 });
 
 // 加載Excel數據
@@ -72,6 +75,26 @@ function bindTabEvents() {
     });
 }
 
+// 綁定頂部導航欄事件
+function bindNavEvents() {
+    document.querySelectorAll('nav a').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            // 移除所有導航激活狀態
+            document.querySelectorAll('nav a').forEach(item => {
+                item.classList.remove('nav-active');
+            });
+            // 當前導航激活
+            this.classList.add('nav-active');
+            // 滾動到對應區域
+            const targetId = this.getAttribute('href');
+            document.querySelector(targetId).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+}
+
 // 切換選項卡
 function switchTab(btn, sectionId) {
     // 移除所有同區域選項卡的active類
@@ -82,7 +105,7 @@ function switchTab(btn, sectionId) {
     btn.classList.add('active');
 }
 
-// 渲染對賽安排
+// 渲染對賽安排（包含組別欄位）
 function renderMatches(group) {
     const contentEl = document.getElementById('matches-content');
     const matchesData = excelData[`${group}_對賽安排`] || [];
@@ -92,16 +115,17 @@ function renderMatches(group) {
         return;
     }
     
-    // 生成表格
+    // 生成表格（新增「組別」欄位）
     let tableHtml = `
         <table>
             <thead>
                 <tr>
                     <th>日期</th>
                     <th>時間</th>
-                    <th>對賽隊伍A</th>
-                    <th>對賽隊伍B</th>
+                    <th>隊伍A</th>
+                    <th>隊伍B</th>
                     <th>場地</th>
+                    <th>組別</th>
                 </tr>
             </thead>
             <tbody>
@@ -115,6 +139,7 @@ function renderMatches(group) {
                 <td>${item.隊伍A || '-'}</td>
                 <td>${item.隊伍B || '-'}</td>
                 <td>${item.場地 || '-'}</td>
+                <td>${item.組別 || '-'}</td>
             </tr>
         `;
     });
@@ -127,7 +152,7 @@ function renderMatches(group) {
     contentEl.innerHTML = tableHtml;
 }
 
-// 渲染對賽成績
+// 渲染對賽成績（可選添加組別欄位）
 function renderResults(group) {
     const contentEl = document.getElementById('results-content');
     const resultsData = excelData[`${group}_對賽成績`] || [];
@@ -137,7 +162,7 @@ function renderResults(group) {
         return;
     }
     
-    // 生成表格
+    // 生成表格（可選添加組別欄位）
     let tableHtml = `
         <table>
             <thead>
@@ -147,6 +172,7 @@ function renderResults(group) {
                     <th>比分</th>
                     <th>隊伍B</th>
                     <th>備註</th>
+                    <th>組別</th>
                 </tr>
             </thead>
             <tbody>
@@ -160,6 +186,7 @@ function renderResults(group) {
                 <td>${item.比分 || '-'}</td>
                 <td>${item.隊伍B || '-'}</td>
                 <td>${item.備註 || '-'}</td>
+                <td>${item.組別 || '-'}</td>
             </tr>
         `;
     });
@@ -172,7 +199,7 @@ function renderResults(group) {
     contentEl.innerHTML = tableHtml;
 }
 
-// 渲染積分榜
+// 渲染積分榜（可選添加組別欄位）
 function renderRankings(group) {
     const contentEl = document.getElementById('rankings-content');
     const rankingsData = excelData[`${group}_積分榜`] || [];
@@ -185,7 +212,7 @@ function renderRankings(group) {
     // 按積分降序排序
     rankingsData.sort((a, b) => (b.積分 || 0) - (a.積分 || 0));
     
-    // 生成表格
+    // 生成表格（可選添加組別欄位）
     let tableHtml = `
         <table>
             <thead>
@@ -195,6 +222,7 @@ function renderRankings(group) {
                     <th>勝場</th>
                     <th>負場</th>
                     <th>積分</th>
+                    <th>組別</th>
                 </tr>
             </thead>
             <tbody>
@@ -208,6 +236,7 @@ function renderRankings(group) {
                 <td>${item.勝場 || 0}</td>
                 <td>${item.負場 || 0}</td>
                 <td>${item.積分 || 0}</td>
+                <td>${item.組別 || '-'}</td>
             </tr>
         `;
     });
