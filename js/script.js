@@ -38,9 +38,9 @@ function getSafeValue(item, keys) {
 }
 
 // ========== 數據加載 ==========
-// 加載Excel數據
+// 加載Excel數據（禁用緩存）
 function loadExcelData() {
-    // 添加時間戳禁用緩存
+    // 添加時間戳禁用緩存，確保讀取最新文件
     fetch(DATA_FILE_PATH + '?t=' + new Date().getTime())
         .then(response => {
             if (!response.ok) throw new Error('加載數據文件失敗，狀態碼：' + response.status);
@@ -136,7 +136,7 @@ function switchTab(btn, sectionId) {
 }
 
 // ========== 渲染函數 ==========
-// 渲染對賽安排（修復時間/隊伍/組別顯示）
+// 渲染對賽安排（匹配Excel表頭：隊伍 A / 隊伍 B）
 function renderMatches(group) {
     const contentEl = document.getElementById('matches-content');
     const matchesData = excelData[`${group}_對賽安排`] || [];
@@ -163,13 +163,13 @@ function renderMatches(group) {
     `;
     
     matchesData.forEach(item => {
-        // 兼容多種表頭命名方式
-        const date = getSafeValue(item, ['日期', '比賽日期']);
-        const time = excelTimeToHHMM(getSafeValue(item, ['時間', '比賽時間']));
-        const teamA = item['隊伍A'] || '-';
-        const teamB = item['隊伍B'] || '-';
-        const venue = getSafeValue(item, ['場地', '比賽場地']);
-        const subgroup = getSafeValue(item, ['組別', '小組']);
+        // 完全匹配Excel表頭（含空格）
+        const date = item['日期'] || '-';
+        const time = excelTimeToHHMM(item['時間'] || '-');
+        const teamA = item['隊伍 A'] || '-'; // 重點：表頭是「隊伍 A」（有空格）
+        const teamB = item['隊伍 B'] || '-'; // 重點：表頭是「隊伍 B」（有空格）
+        const venue = item['場地'] || '-';
+        const subgroup = item['組別'] || '-';
         
         tableHtml += `
             <tr>
@@ -191,7 +191,7 @@ function renderMatches(group) {
     contentEl.innerHTML = tableHtml;
 }
 
-// 渲染對賽成績（可選添加組別欄位）
+// 渲染對賽成績（匹配Excel表頭：隊伍 A / 隊伍 B）
 function renderResults(group) {
     const contentEl = document.getElementById('results-content');
     const resultsData = excelData[`${group}_對賽成績`] || [];
@@ -218,12 +218,12 @@ function renderResults(group) {
     `;
     
     resultsData.forEach(item => {
-        const date = getSafeValue(item, ['日期', '比賽日期']);
-        const teamA = getSafeValue(item, ['隊伍A', '對賽隊伍A']);
-        const score = getSafeValue(item, ['比分', '成績']);
-        const teamB = getSafeValue(item, ['隊伍B', '對賽隊伍B']);
-        const remark = getSafeValue(item, ['備註', '附註']);
-        const subgroup = getSafeValue(item, ['組別', '小組']);
+        const date = item['日期'] || '-';
+        const teamA = item['隊伍 A'] || '-'; // 匹配Excel表頭（有空格）
+        const score = item['比分'] || '-';
+        const teamB = item['隊伍 B'] || '-'; // 匹配Excel表頭（有空格）
+        const remark = item['備註'] || '-';
+        const subgroup = item['組別'] || '-';
         
         tableHtml += `
             <tr>
@@ -256,7 +256,7 @@ function renderRankings(group) {
     }
     
     // 按積分降序排序
-    rankingsData.sort((a, b) => (Number(getSafeValue(b, ['積分'])) || 0) - (Number(getSafeValue(a, ['積分'])) || 0));
+    rankingsData.sort((a, b) => (Number(a['積分'] || 0)) - (Number(b['積分'] || 0)) * -1);
     
     // 生成表格（可選添加組別欄位）
     let tableHtml = `
@@ -275,11 +275,11 @@ function renderRankings(group) {
     `;
     
     rankingsData.forEach((item, index) => {
-        const teamName = getSafeValue(item, ['隊伍名稱', '隊伍']);
-        const win = getSafeValue(item, ['勝場', '勝']);
-        const lose = getSafeValue(item, ['負場', '負']);
-        const score = getSafeValue(item, ['積分']);
-        const subgroup = getSafeValue(item, ['組別', '小組']);
+        const teamName = item['隊伍名稱'] || '-';
+        const win = item['勝場'] || 0;
+        const lose = item['負場'] || 0;
+        const score = item['積分'] || 0;
+        const subgroup = item['組別'] || '-';
         
         tableHtml += `
             <tr>
