@@ -14,6 +14,30 @@ document.addEventListener('DOMContentLoaded', function() {
     bindNavEvents();
 });
 
+// ========== 工具函數 ==========
+// 將 Excel 時間小數轉為 HH:MM 格式
+function excelTimeToHHMM(excelTime) {
+    // 非數字直接返回（如已為文本格式的時間）
+    if (typeof excelTime !== 'number') return excelTime || '-';
+    // Excel時間是當天的小數比例，轉換為分鐘
+    const totalMinutes = Math.round(excelTime * 24 * 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    // 補零格式化為 HH:MM
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
+// 安全獲取數據欄位（兼容不同表頭命名）
+function getSafeValue(item, keys) {
+    for (let key of keys) {
+        if (item.hasOwnProperty(key) && item[key] !== undefined && item[key] !== null) {
+            return item[key];
+        }
+    }
+    return '-';
+}
+
+// ========== 數據加載 ==========
 // 加載Excel數據
 function loadExcelData() {
     fetch(DATA_FILE_PATH)
@@ -48,6 +72,7 @@ function loadExcelData() {
         });
 }
 
+// ========== 事件綁定 ==========
 // 綁定選項卡點擊事件
 function bindTabEvents() {
     // 對賽安排選項卡
@@ -105,7 +130,8 @@ function switchTab(btn, sectionId) {
     btn.classList.add('active');
 }
 
-// 渲染對賽安排（包含組別欄位）
+// ========== 渲染函數 ==========
+// 渲染對賽安排（修復時間/隊伍/組別顯示）
 function renderMatches(group) {
     const contentEl = document.getElementById('matches-content');
     const matchesData = excelData[`${group}_對賽安排`] || [];
@@ -115,15 +141,15 @@ function renderMatches(group) {
         return;
     }
     
-    // 生成表格（新增「組別」欄位）
+    // 生成表格（新增「組別」欄位，修復時間格式）
     let tableHtml = `
         <table>
             <thead>
                 <tr>
                     <th>日期</th>
                     <th>時間</th>
-                    <th>隊伍A</th>
-                    <th>隊伍B</th>
+                    <th>對賽隊伍A</th>
+                    <th>對賽隊伍B</th>
                     <th>場地</th>
                     <th>組別</th>
                 </tr>
@@ -132,14 +158,22 @@ function renderMatches(group) {
     `;
     
     matchesData.forEach(item => {
+        // 兼容多種表頭命名方式
+        const date = getSafeValue(item, ['日期', '比賽日期']);
+        const time = excelTimeToHHMM(getSafeValue(item, ['時間', '比賽時間']));
+        const teamA = getSafeValue(item, ['隊伍A', '對賽隊伍A', '參賽隊伍A']);
+        const teamB = getSafeValue(item, ['隊伍B', '對賽隊伍B', '參賽隊伍B']);
+        const venue = getSafeValue(item, ['場地', '比賽場地']);
+        const subgroup = getSafeValue(item, ['組別', '小組']);
+        
         tableHtml += `
             <tr>
-                <td>${item.日期 || '-'}</td>
-                <td>${item.時間 || '-'}</td>
-                <td>${item.隊伍A || '-'}</td>
-                <td>${item.隊伍B || '-'}</td>
-                <td>${item.場地 || '-'}</td>
-                <td>${item.組別 || '-'}</td>
+                <td>${date}</td>
+                <td>${time}</td>
+                <td>${teamA}</td>
+                <td>${teamB}</td>
+                <td>${venue}</td>
+                <td>${subgroup}</td>
             </tr>
         `;
     });
@@ -179,14 +213,21 @@ function renderResults(group) {
     `;
     
     resultsData.forEach(item => {
+        const date = getSafeValue(item, ['日期', '比賽日期']);
+        const teamA = getSafeValue(item, ['隊伍A', '對賽隊伍A']);
+        const score = getSafeValue(item, ['比分', '成績']);
+        const teamB = getSafeValue(item, ['隊伍B', '對賽隊伍B']);
+        const remark = getSafeValue(item, ['備註', '附註']);
+        const subgroup = getSafeValue(item, ['組別', '小組']);
+        
         tableHtml += `
             <tr>
-                <td>${item.日期 || '-'}</td>
-                <td>${item.隊伍A || '-'}</td>
-                <td>${item.比分 || '-'}</td>
-                <td>${item.隊伍B || '-'}</td>
-                <td>${item.備註 || '-'}</td>
-                <td>${item.組別 || '-'}</td>
+                <td>${date}</td>
+                <td>${teamA}</td>
+                <td>${score}</td>
+                <td>${teamB}</td>
+                <td>${remark}</td>
+                <td>${subgroup}</td>
             </tr>
         `;
     });
@@ -210,7 +251,7 @@ function renderRankings(group) {
     }
     
     // 按積分降序排序
-    rankingsData.sort((a, b) => (b.積分 || 0) - (a.積分 || 0));
+    rankingsData.sort((a, b) => (Number(getSafeValue(b, ['積分'])) || 0) - (Number(getSafeValue(a, ['積分'])) || 0));
     
     // 生成表格（可選添加組別欄位）
     let tableHtml = `
@@ -229,14 +270,20 @@ function renderRankings(group) {
     `;
     
     rankingsData.forEach((item, index) => {
+        const teamName = getSafeValue(item, ['隊伍名稱', '隊伍']);
+        const win = getSafeValue(item, ['勝場', '勝']);
+        const lose = getSafeValue(item, ['負場', '負']);
+        const score = getSafeValue(item, ['積分']);
+        const subgroup = getSafeValue(item, ['組別', '小組']);
+        
         tableHtml += `
             <tr>
                 <td>${index + 1}</td>
-                <td>${item.隊伍名稱 || '-'}</td>
-                <td>${item.勝場 || 0}</td>
-                <td>${item.負場 || 0}</td>
-                <td>${item.積分 || 0}</td>
-                <td>${item.組別 || '-'}</td>
+                <td>${teamName}</td>
+                <td>${win}</td>
+                <td>${lose}</td>
+                <td>${score}</td>
+                <td>${subgroup}</td>
             </tr>
         `;
     });
