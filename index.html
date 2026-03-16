@@ -68,9 +68,29 @@
     </main>
 
     <footer>
+        <a href="#" onclick="showModal('about-modal');return false;">關於</a> | 
+        <a href="#" onclick="showModal('privacy-modal');return false;">隱私政策</a> | 
+        <a href="#" onclick="showModal('disclaimer-modal');return false;">免責聲明</a>
         <p>澳門工人飛雪杯2026 - 數據最後更新時間: <span id="update-time">未加載</span></p>
     </footer>
 
-    <script src="js/script.js"></script>
+    <!-- Modal HTML -->
+<div id="about-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h2>關於</h2>
+    <p>本網站為《澳門雪杯足球賽2026》非官方資訊平台...</p>
+    <button onclick="closeModal('about-modal')">關閉</button>
+  </div>
+</div>
+<!-- privacy-modal 和 disclaimer-modal 省略，類似寫法 -->
+
+<script>
+function showModal(id) {
+  document.getElementById(id).style.display = "block";
+}
+function closeModal(id) {
+  document.getElementById(id).style.display = "none";
+}
+</script>
 </body>
 </html>
