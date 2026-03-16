@@ -41,7 +41,7 @@ nav a {
 }
 
 nav a:hover {
-    background-color: #34495e;
+    background-color: #3498db;
 }
 
 main {
@@ -93,14 +93,13 @@ main {
     background-color: #d5e8f3;
 }
 
-/* 內容區域 - 关键修改：去掉overflow-x，避免滚动条 */
+/* 內容區域 - 去掉横向滚动条 */
 .tab-content {
     min-height: 300px;
     padding: 10px;
     width: 100%;
     max-width: 1300px;
     margin: auto;
-    /* 移除 overflow-x: auto，彻底去掉横向滚动条 */
 }
 
 .loading {
@@ -110,41 +109,36 @@ main {
     font-size: 1.2rem;
 }
 
-/* 表格樣式 - 核心优化：适配屏幕，去掉滚动条 */
+/* 表格樣式 - 核心优化（适配所有屏幕） */
 table {
     width: 100%;
     border-collapse: collapse;
     margin: 15px 0;
     background: #fff;
-    /* 让表格宽度强制适配父容器 */
-    table-layout: fixed;
+    table-layout: fixed; /* 强制表格适配父容器宽度 */
 }
 
 th, td {
-    padding: 12px 15px;
+    padding: 12px 10px;
     text-align: left;
     border: 1px solid #ccc;
     font-size: 16px;
-    /* 关键1：允许文字换行，避免撑大表格 */
-    white-space: normal;
-    /* 关键2：自动换行 + 超出显示省略号（可选，根据需求） */
-    word-wrap: break-word;
-    word-break: break-all;
-    /* 移除 min-width，避免强制固定宽度 */
+    white-space: normal; /* 允许文字换行 */
+    word-wrap: break-word; /* 长单词换行 */
+    word-break: break-all; /* 强制换行，避免溢出 */
 }
 
 th {
     background-color: #3498db;
     color: white;
-    /* 表头文字也允许换行 */
-    white-space: normal;
+    white-space: normal; /* 表头也允许换行 */
 }
 
 tr:hover {
     background-color: #f8f9fa;
 }
 
-/* 響應式調整 - 增强表格适配 */
+/* 響應式基礎調整 */
 @media (max-width: 768px) {
     header h1 {
         font-size: 2rem;
@@ -160,99 +154,134 @@ tr:hover {
     
     th, td {
         padding: 8px 10px;
-        /* 移动端进一步缩小内边距，适配窄屏 */
     }
 }
 
+/* 手机横屏专属优化（核心！解决横屏拥挤问题） */
+@media (max-width: 900px) and (orientation: landscape) {
+    /* 缩小整体字号和内边距 */
+    table {
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 8px 6px;
+        font-size: 14px;
+    }
+
+    /* 列宽智能分配：核心列（队伍）多分配宽度，次要列压缩 */
+    th:nth-child(1), th:nth-child(2),
+    td:nth-child(1), td:nth-child(2) {
+        width: 10%; /* 日期/时间列 */
+    }
+    th:nth-child(3), th:nth-child(4),
+    td:nth-child(3), td:nth-child(4) {
+        width: 22%; /* 队伍A/B列（核心列，多分配宽度） */
+    }
+    th:nth-child(5), th:nth-child(6), th:nth-child(7), th:nth-child(8),
+    td:nth-child(5), td:nth-child(6), td:nth-child(7), td:nth-child(8) {
+        width: 9%; /* 场地/组别/比分/备注列（次要列，压缩） */
+    }
+
+    /* 表头文字不换行，避免高度过高 */
+    th {
+        white-space: nowrap;
+        font-size: 13px;
+    }
+}
+
+/* 手机竖屏极致适配（可选） */
+@media (max-width: 480px) {
+    th, td {
+        padding: 6px 8px;
+        font-size: 14px;
+    }
+    th {
+        font-size: 13px;
+    }
+}
+
+/* footer樣式 */
 footer {
     text-align: center;
-    padding: 20px;
-    background-color: #2c3e50;
-    color: white;
-    margin-top: 50px;
-}
-
-/* -- footer section -- */
-footer {
-  text-align: center;
-  margin-top: 40px;
-  color: #888;
-  font-size: 15px;
-  padding: 16px 0;
-  background: #f8f8f8;
-  border-top: 1px solid #e0e0e0;
+    margin-top: 40px;
+    color: #888;
+    font-size: 15px;
+    padding: 16px 0;
+    background: #f8f8f8;
+    border-top: 1px solid #e0e0e0;
 }
 footer a {
-  color: #3498db;
-  text-decoration: none;
-  margin: 0 8px;
+    color: #3498db;
+    text-decoration: none;
+    margin: 0 8px;
 }
 footer a:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }
 
-/* -- About/Privacy/Disclaimer section -- */
+/* About/Privacy/Disclaimer section */
 section {
-  margin: 24px auto;
-  max-width: 560px;
-  background: #fff;
-  padding: 20px 28px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    margin: 24px auto;
+    max-width: 560px;
+    background: #fff;
+    padding: 20px 28px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
 }
 section h2 {
-  font-size: 22px;
-  color: #222;
-  margin-bottom: 8px;
+    font-size: 22px;
+    color: #222;
+    margin-bottom: 8px;
 }
 section p {
-  font-size: 16px;
-  color: #444;
+    font-size: 16px;
+    color: #444;
 }
 
-/* -- Modal (彈窗) -- */
+/* Modal (彈窗) */
 .modal {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.25);
-  display: none;
-  z-index: 100;
-  align-items: center;
-  justify-content: center;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.25);
+    display: none;
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
 }
 .modal.show {
-  display: flex;
+    display: flex;
 }
 .modal-content {
-  background: #fff;
-  padding: 2em 1.4em;
-  border-radius: 8px;
-  max-width: 380px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.25);
-  text-align: left;
+    background: #fff;
+    padding: 2em 1.4em;
+    border-radius: 8px;
+    max-width: 380px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    text-align: left;
 }
 .modal-content h2 {
-  margin-top: 0;
+    margin-top: 0;
 }
 .modal-content button {
-  margin-top: 16px;
-  padding: 8px 16px;
-  border: none;
-  background: #3498db;
-  color: #fff;
-  border-radius: 4px;
-  cursor: pointer;
+    margin-top: 16px;
+    padding: 8px 16px;
+    border: none;
+    background: #3498db;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
 }
 .modal-content button:hover {
-  background: #217dbb;
+    background: #217dbb;
 }
 
-/* -- 回主頁連結 -- */
+/* 回主頁連結 */
 .back-link {
-  display: inline-block;
-  margin-top: 24px;
-  color: #3498db;
-  text-decoration: underline;
-  font-size: 16px;
+    display: inline-block;
+    margin-top: 24px;
+    color: #3498db;
+    text-decoration: underline;
+    font-size: 16px;
 }
