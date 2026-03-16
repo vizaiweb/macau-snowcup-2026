@@ -239,3 +239,31 @@ section p {
   text-decoration: underline;
   font-size: 16px;
 }
+
+/* 表格全寬度（自動填滿父容器，不限制最大寬度） */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+/* 表頭樣式保持原設計 */
+table th, table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  font-size: 16px;
+}
+
+/* 自動分配欄寬（不壓縮內容） */
+table th, table td {
+  min-width: 80px;
+  white-space: nowrap;
+}
+
+/* 響應式，table區上層容器可調寬度（如下如需調整） */
+.section .tab-content {
+  width: 100%;
+  max-width: 1300px;   /* 可按需求調整到更大 */
+  margin: auto;
+  overflow-x: auto;
+}
