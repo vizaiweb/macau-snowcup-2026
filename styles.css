@@ -93,107 +93,89 @@ main {
     background-color: #d5e8f3;
 }
 
-/* 內容區域 - 关键：仅手机端允许横向滚动，网页版完全正常 */
+/* 內容區域 - 彻底禁用横向滚动 */
 .tab-content {
     min-height: 300px;
     padding: 10px;
     width: 100%;
     max-width: 1300px;
     margin: auto;
-    /* 网页版无滚动，手机端才显示滚动条 */
-    overflow-x: hidden;
+    overflow-x: hidden; /* 强制禁用横向滚动 */
 }
 
-/* 表格容器：专门处理表格滚动，不影响其他内容 */
-.table-container {
-    width: 100%;
-    overflow-x: auto;
-    /* 滚动条样式优化：移动端更顺滑，网页版几乎看不见 */
-    scrollbar-width: thin;
-    scrollbar-color: #3498db #f5f5f5;
-}
-
-/* 表格樣式 - 恢复网页版原有体验，仅优化手机端 */
+/* 表格樣式 - 核心：无滚动+自适应压缩 */
 table {
     width: 100%;
     border-collapse: collapse;
     margin: 15px 0;
     background: #fff;
-    /* 移除fixed布局，恢复网页版自动列宽 */
-    table-layout: auto;
+    table-layout: fixed; /* 强制表格不超宽 */
 }
 
 th, td {
-    padding: 12px 15px;
-    text-align: left;
+    padding: 8px 4px; /* 极致压缩内边距，省空间 */
+    text-align: center; /* 居中对齐，减少文字占用宽度 */
     border: 1px solid #ccc;
-    font-size: 16px;
-    /* 网页版文字不换行，保证排版整齐 */
-    white-space: nowrap;
-    /* 移除强制换行，恢复原有样式 */
-    word-wrap: normal;
-    word-break: normal;
+    font-size: 15px;
+    white-space: nowrap; /* 文字不换行（避免高度过高） */
+    overflow: hidden; /* 超出部分隐藏 */
+    text-overflow: ellipsis; /* 超出显示省略号 */
 }
 
+/* 表头样式优化 */
 th {
     background-color: #3498db;
     color: white;
-    /* 表头恢复不换行 */
-    white-space: nowrap;
+    font-size: 14px;
 }
 
 tr:hover {
     background-color: #f8f9fa;
 }
 
-/* 響應式基礎調整（仅改非表格样式） */
-@media (max-width: 768px) {
+/* 按列智能分配宽度（关键！根据内容调整） */
+/* 请根据你的表格列数/内容修改：数字对应列的序号 */
+th:nth-child(1), td:nth-child(1) { width: 8%; }  /* 日期列 */
+th:nth-child(2), td:nth-child(2) { width: 8%; }  /* 时间列 */
+th:nth-child(3), td:nth-child(3) { width: 18%; } /* 队伍A列（重点留空间） */
+th:nth-child(4), td:nth-child(4) { width: 18%; } /* 队伍B列（重点留空间） */
+th:nth-child(5), td:nth-child(5) { width: 12%; } /* 场地列 */
+th:nth-child(6), td:nth-child(6) { width: 10%; } /* 组别列 */
+th:nth-child(7), td:nth-child(7) { width: 10%; } /* 比分列 */
+th:nth-child(8), td:nth-child(8) { width: 16%; } /* 备注列 */
+
+/* 響應式調整 - 仅缩小字号，不滚动 */
+@media (max-width: 900px) { /* 手机横屏/平板 */
     header h1 {
         font-size: 2rem;
     }
-    
     .tabs {
         flex-direction: column;
     }
-}
-
-/* 手机横屏/竖屏统一处理：仅表格容器可滚动，不影响其他内容 */
-@media (max-width: 900px) {
-    /* 表格容器允许横向滚动，滚动条更友好 */
-    .table-container {
-        overflow-x: auto;
-        /* 给滚动容器加阴影，提示可滑动 */
-        box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
-        border-radius: 8px;
-    }
-
-    /* 手机端表格字号缩小，内边距微调 */
-    table {
-        font-size: 14px;
-    }
-
+    /* 手机端进一步压缩字号和内边距 */
     th, td {
-        padding: 8px 10px;
-        font-size: 14px;
-        /* 手机端允许单元格文字换行，避免滚动距离过长 */
-        white-space: normal;
+        padding: 6px 2px;
+        font-size: 12px;
     }
+    th {
+        font-size: 11px;
+    }
+    /* 手机端重新分配列宽，优先保证核心列 */
+    th:nth-child(1), td:nth-child(1) { width: 7%; }
+    th:nth-child(2), td:nth-child(2) { width: 7%; }
+    th:nth-child(3), td:nth-child(3) { width: 20%; }
+    th:nth-child(4), td:nth-child(4) { width: 20%; }
+    th:nth-child(5), td:nth-child(5) { width: 10%; }
+    th:nth-child(6), td:nth-child(6) { width: 8%; }
+    th:nth-child(7), td:nth-child(7) { width: 8%; }
+    th:nth-child(8), td:nth-child(8) { width: 20%; }
 }
 
-/* 滚动条样式优化（可选，让滚动条更美观） */
-.table-container::-webkit-scrollbar {
-    height: 6px;
-}
-.table-container::-webkit-scrollbar-track {
-    background: #f5f5f5;
-    border-radius: 3px;
-}
-.table-container::-webkit-scrollbar-thumb {
-    background: #3498db;
-    border-radius: 3px;
-}
-.table-container::-webkit-scrollbar-thumb:hover {
-    background: #217dbb;
+@media (max-width: 480px) { /* 手机竖屏 */
+    th, td {
+        font-size: 11px;
+        padding: 4px 1px;
+    }
 }
 
 /* footer樣式 */
@@ -202,4 +184,81 @@ footer {
     margin-top: 40px;
     color: #888;
     font-size: 15px;
+    padding: 16px 0;
+    background: #f8f8f8;
+    border-top: 1px solid #e0e0e0;
+}
+footer a {
+    color: #3498db;
+    text-decoration: none;
+    margin: 0 8px;
+}
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* About/Privacy/Disclaimer section */
+section {
+    margin: 24px auto;
+    max-width: 560px;
+    background: #fff;
+    padding: 20px 28px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+section h2 {
+    font-size: 22px;
+    color: #222;
+    margin-bottom: 8px;
+}
+section p {
+    font-size: 16px;
+    color: #444;
+}
+
+/* Modal (彈窗) */
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.25);
+    display: none;
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+}
+.modal.show {
+    display: flex;
+}
+.modal-content {
+    background: #fff;
+    padding: 2em 1.4em;
+    border-radius: 8px;
+    max-width: 380px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    text-align: left;
+}
+.modal-content h2 {
+    margin-top: 0;
+}
+.modal-content button {
+    margin-top: 16px;
+    padding: 8px 16px;
+    border: none;
+    background: #3498db;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.modal-content button:hover {
+    background: #217dbb;
+}
+
+/* 回主頁連結 */
+.back-link {
+    display: inline-block;
+    margin-top: 24px;
+    color: #3498db;
+    text-decoration: underline;
+    font-size: 16px;
 }
