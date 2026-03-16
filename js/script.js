@@ -1,261 +1,211 @@
-// 全局變量
-let excelData = {};
-const DATA_FILE_PATH = 'data/matches_data.xlsx';
-
-// 頁面加載完成後執行
-document.addEventListener('DOMContentLoaded', function() {
-    loadExcelData();
-    bindTabEvents();
-    bindNavEvents();
-});
-
-// ========== 工具函數 ==========
-function excelTimeToHHMM(excelTime) {
-    if (typeof excelTime !== 'number') return excelTime || '-';
-    const totalMinutes = Math.round(excelTime * 24 * 60);
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = totalMinutes % 60;
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-}
-
-// ========== 數據加載 ==========
-function loadExcelData() {
-    // 禁用緩存，強制讀取最新Excel
-    fetch(DATA_FILE_PATH + '?t=' + new Date().getTime())
-        .then(response => {
-            if (!response.ok) throw new Error('加載數據失敗：' + response.status);
-            return response.arrayBuffer();
-        })
-        .then(data => {
-            const workbook = XLSX.read(data, { type: 'array' });
-            // 只讀取需要的工作表（簡化邏輯）
-            const targetSheet = '初級組_對賽安排';
-            if (workbook.SheetNames.includes(targetSheet)) {
-                excelData[targetSheet] = XLSX.utils.sheet_to_json(workbook.Sheets[targetSheet]);
-                console.log('✅ 數據讀取成功：', excelData[targetSheet]); // 控制台查看數據
-            }
-            // 強制渲染
-            renderMatches('初級組');
-            document.getElementById('update-time').textContent = new Date().toLocaleString('zh-Hant-MO');
-        })
-        .catch(error => {
-            console.error('❌ 加載錯誤：', error);
-            document.getElementById('matches-content').innerHTML = `<div>加載失敗：${error.message}</div>`;
-        });
-}
-
-// ========== 事件綁定 ==========
-function bindTabEvents() {
-    document.querySelectorAll('#matches .tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            switchTab(this, '#matches');
-            renderMatches(this.dataset.group);
-        });
-    });
-    document.querySelectorAll('#results .tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            switchTab(this, '#results');
-            renderResults(this.dataset.group);
-        });
-    });
-    document.querySelectorAll('#rankings .tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            switchTab(this, '#rankings');
-            renderRankings(this.dataset.group);
-        });
-    });
-}
-
-function bindNavEvents() {
-    document.querySelectorAll('nav a').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            document.querySelectorAll('nav a').forEach(item => item.classList.remove('nav-active'));
-            this.classList.add('nav-active');
-            document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
-        });
-    });
-}
-
-function switchTab(btn, sectionId) {
-    document.querySelectorAll(`${sectionId} .tab-btn`).forEach(tab => tab.classList.remove('active'));
-    btn.classList.add('active');
-}
-
-// ========== 渲染函數 ==========
-// 核心：匹配Excel表頭「隊伍A」「隊伍B」（無空格）
-function renderMatches(group) {
-    const contentEl = document.getElementById('matches-content');
+// 渲染積分榜 —— 包含棄權3:0規則 + 完整賽制
+function renderRankings(group) {
+    const contentEl = document.getElementById('rankings-content');
     const matchesData = excelData[`${group}_對賽安排`] || [];
 
     if (matchesData.length === 0) {
-        contentEl.innerHTML = `<div>${group}暫無對賽安排數據</div>`;
+        contentEl.innerHTML = `<div class="loading">${group}暫無積分數據</div>`;
         return;
     }
 
-    let tableHtml = `
-        <table border="1" style="width:100%;border-collapse:collapse;">
-            <thead>
-                <tr style="background:#f0f0f0;">
-                    <th>日期</th>
-                    <th>時間</th>
-                    <th>對賽隊伍A</th>
-                    <th>對賽隊伍B</th>
-                    <th>場地</th>
-                    <th>組別</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
+    // 1. 處理所有賽事（包含正常賽事 + 棄權賽事）
+    const processedMatches = [];
     matchesData.forEach(item => {
-        // 100%匹配Excel表頭（無空格）
-        const date = item['日期'] || '-';
-        const time = excelTimeToHHMM(item['時間']);
-        const teamA = item['隊伍A'] || '-'; // 無空格
-        const teamB = item['隊伍B'] || '-'; // 無空格
-        const venue = item['場地'] || '-';
-        const subgroup = item['組別'] || '-';
+        const teamA = item['隊伍A'] || '-';
+        const teamB = item['隊伍B'] || '-';
+        const score = item['比分'] || '';
+        const remark = item['備註'] || ''; // 用備註標註棄權：如「A隊棄權」「B隊棄權」
+        const subgroup = item['組別'] || '未分組';
 
-        tableHtml += `
-            <tr>
-                <td>${date}</td>
-                <td>${time}</td>
-                <td>${teamA}</td>
-                <td>${teamB}</td>
-                <td>${venue}</td>
-                <td>${subgroup}</td>
-            </tr>
-        `;
+        // 情況1：正常賽事（有比分且不是--）
+        if (score.trim() !== '' && score.trim() !== '--' && score.includes('-')) {
+            processedMatches.push({
+                teamA, teamB,
+                scoreA: parseInt(score.split('-')[0]) || 0,
+                scoreB: parseInt(score.split('-')[1]) || 0,
+                subgroup,
+                isForfeit: false,
+                forfeitTeam: '' // 記錄棄權隊伍
+            });
+        }
+        // 情況2：棄權賽事（備註標註棄權 或 比分為--）
+        else if (remark.includes('棄權') || score.trim() === '--') {
+            let scoreA = 0, scoreB = 0, forfeitTeam = '';
+            // A隊棄權 → B隊3:0勝
+            if (remark.includes('A隊棄權') || remark.includes('隊伍A棄權')) {
+                scoreA = 0;
+                scoreB = 3;
+                forfeitTeam = teamA;
+            }
+            // B隊棄權 → A隊3:0勝
+            else if (remark.includes('B隊棄權') || remark.includes('隊伍B棄權')) {
+                scoreA = 3;
+                scoreB = 0;
+                forfeitTeam = teamB;
+            }
+            // 未標註具體隊伍 → 默認按章程補充規則（需手動確認）
+            else {
+                scoreA = 3;
+                scoreB = 0;
+                forfeitTeam = teamB;
+            }
+            processedMatches.push({
+                teamA, teamB, scoreA, scoreB,
+                subgroup,
+                isForfeit: true,
+                forfeitTeam
+            });
+        }
     });
 
-    tableHtml += `</tbody></table>`;
-    contentEl.innerHTML = tableHtml;
-}
-
-// 渲染對賽成績 —— 從「對賽安排」表讀取，自動依組別分表
-function renderResults(group) {
-  const contentEl = document.getElementById('results-content');
-  // 直接讀取「對賽安排」的數據
-  const allMatches = excelData[`${group}_對賽安排`] || [];
-  
-  // 只保留「有填比分」的賽事（代表已完賽）
-  const resultsData = allMatches.filter(item => {
-    const score = item['比分'] || '';
-    return score.trim() !== ''; // 有比分才顯示
-  });
-
-  if (resultsData.length === 0) {
-    contentEl.innerHTML = `<div class="loading">${group}暫無已完賽的對賽成績</div>`;
-    return;
-  }
-
-  // 依「組別」分組
-  const grouped = {};
-  resultsData.forEach(item => {
-    const g = item['組別'] || '未分組';
-    if (!grouped[g]) grouped[g] = [];
-    grouped[g].push(item);
-  });
-
-  let html = '';
-
-  // 每個組別產生一張獨立表格
-  Object.keys(grouped).forEach(groupName => {
-    const list = grouped[groupName];
-
-    html += `
-    <div style="margin-bottom:24px;">
-      <h3 style="margin:0 0 8px; font-size:16px; font-weight:bold;">${groupName}</h3>
-      <table style="width:100%;border-collapse:collapse;">
-        <thead>
-          <tr style="background:#4285f4; color:white;">
-            <th style="border:1px solid #ccc; padding:8px;">日期</th>
-            <th style="border:1px solid #ccc; padding:8px;">時間</th>
-            <th style="border:1px solid #ccc; padding:8px;">對賽隊伍A</th>
-            <th style="border:1px solid #ccc; padding:8px;">比分</th>
-            <th style="border:1px solid #ccc; padding:8px;">對賽隊伍B</th>
-            <th style="border:1px solid #ccc; padding:8px;">場地</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-
-    list.forEach(item => {
-      const date = item['日期'] || '-';
-      const time = excelTimeToHHMM(item['時間']);
-      const teamA = item['隊伍A'] || '-';
-      const score = item['比分'] || '-';
-      const teamB = item['隊伍B'] || '-';
-      const venue = item['場地'] || '-';
-
-      html += `
-        <tr>
-          <td style="border:1px solid #ccc; padding:8px;">${date}</td>
-          <td style="border:1px solid #ccc; padding:8px;">${time}</td>
-          <td style="border:1px solid #ccc; padding:8px;">${teamA}</td>
-          <td style="border:1px solid #ccc; padding:8px; font-weight:bold;">${score}</td>
-          <td style="border:1px solid #ccc; padding:8px;">${teamB}</td>
-          <td style="border:1px solid #ccc; padding:8px;">${venue}</td>
-        </tr>
-      `;
-    });
-
-    html += `
-        </tbody>
-      </table>
-    </div>
-    `;
-  });
-
-  contentEl.innerHTML = html;
-}
-
-function renderRankings(group) {
-    const contentEl = document.getElementById('rankings-content');
-    const rankingsData = excelData[`${group}_積分榜`] || [];
-
-    if (rankingsData.length === 0) {
-        contentEl.innerHTML = `<div>${group}暫無積分榜數據</div>`;
+    if (processedMatches.length === 0) {
+        contentEl.innerHTML = `<div class="loading">${group}暫無已完賽/棄權賽事，積分榜待更新</div>`;
         return;
     }
 
-    rankingsData.sort((a, b) => (Number(b['積分']) || 0) - (Number(a['積分']) || 0));
+    // 2. 初始化數據結構
+    const groupStats = {}; // { 組別: { 隊伍名: { ...stats } } }
+    const forfeitTeams = new Set(); // 記錄有棄權記錄的隊伍
 
-    let tableHtml = `
-        <table border="1" style="width:100%;border-collapse:collapse;">
-            <thead>
-                <tr style="background:#f0f0f0;">
-                    <th>排名</th>
-                    <th>隊伍名稱</th>
-                    <th>勝場</th>
-                    <th>負場</th>
-                    <th>積分</th>
-                    <th>組別</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
+    // 3. 計算積分/勝負/進失球
+    processedMatches.forEach(match => {
+        const { teamA, teamB, scoreA, scoreB, subgroup, isForfeit, forfeitTeam } = match;
 
-    rankingsData.forEach((item, index) => {
-        const teamName = item['隊伍名稱'] || '-';
-        const win = item['勝場'] || 0;
-        const lose = item['負場'] || 0;
-        const score = item['積分'] || 0;
-        const subgroup = item['組別'] || '-';
+        if (!teamA || !teamB || teamA === '-' || teamB === '-') return;
 
-        tableHtml += `
-            <tr>
-                <td>${index + 1}</td>
-                <td>${teamName}</td>
-                <td>${win}</td>
-                <td>${lose}</td>
-                <td>${score}</td>
-                <td>${subgroup}</td>
+        // 初始化組別和隊伍
+        if (!groupStats[subgroup]) groupStats[subgroup] = {};
+        ['win', 'draw', 'lose', 'goal', 'concede', 'score', 'headToHead', 'forfeitCount'].forEach(key => {
+            if (!groupStats[subgroup][teamA]) groupStats[subgroup][teamA] = {
+                win: 0, draw: 0, lose: 0,
+                goal: 0, concede: 0, score: 0,
+                headToHead: {},
+                forfeitCount: 0 // 棄權次數
+            };
+            if (!groupStats[subgroup][teamB]) groupStats[subgroup][teamB] = {
+                win: 0, draw: 0, lose: 0,
+                goal: 0, concede: 0, score: 0,
+                headToHead: {},
+                forfeitCount: 0
+            };
+        });
+
+        // 標記棄權隊伍
+        if (isForfeit && forfeitTeam) {
+            groupStats[subgroup][forfeitTeam].forfeitCount += 1;
+            forfeitTeams.add(forfeitTeam);
+        }
+
+        // 更新進失球
+        groupStats[subgroup][teamA].goal += scoreA;
+        groupStats[subgroup][teamA].concede += scoreB;
+        groupStats[subgroup][teamB].goal += scoreB;
+        groupStats[subgroup][teamB].concede += scoreA;
+
+        // 記錄對賽數據
+        groupStats[subgroup][teamA].headToHead[teamB] = { a: scoreA, b: scoreB };
+        groupStats[subgroup][teamB].headToHead[teamA] = { a: scoreB, b: scoreA };
+
+        // 計算積分（勝3/平1/負0）
+        if (scoreA > scoreB) {
+            groupStats[subgroup][teamA].win += 1;
+            groupStats[subgroup][teamA].score += 3;
+            groupStats[subgroup][teamB].lose += 1;
+        } else if (scoreA < scoreB) {
+            groupStats[subgroup][teamB].win += 1;
+            groupStats[subgroup][teamB].score += 3;
+            groupStats[subgroup][teamA].lose += 1;
+        } else {
+            groupStats[subgroup][teamA].draw += 1;
+            groupStats[subgroup][teamA].score += 1;
+            groupStats[subgroup][teamB].draw += 1;
+            groupStats[subgroup][teamB].score += 1;
+        }
+    });
+
+    // 4. 按賽制排序（優先：棄權次數→積分→對賽成績→淨勝球→進球數）
+    let html = '';
+    Object.keys(groupStats).forEach(subgroup => {
+        const teams = groupStats[subgroup];
+        const sortedTeams = Object.keys(teams).sort((a, b) => {
+            const ta = teams[a], tb = teams[b];
+
+            // 規則1：棄權次數少者在前
+            if (ta.forfeitCount !== tb.forfeitCount) return ta.forfeitCount - tb.forfeitCount;
+
+            // 規則2：積分高者在前
+            if (tb.score !== ta.score) return tb.score - ta.score;
+
+            // 規則3：對賽成績（勝場→淨勝球→進球數）
+            const h2h = ta.headToHead[b];
+            if (h2h) {
+                if (h2h.a > h2h.b) return -1;
+                if (h2h.a < h2h.b) return 1;
+                const netA = h2h.a - h2h.b;
+                const netB = h2h.b - h2h.a;
+                if (netA !== netB) return netB - netA;
+                if (h2h.a !== h2h.b) return h2h.b - h2h.a;
+            }
+
+            // 規則4：總淨勝球
+            const netA = ta.goal - ta.concede;
+            const netB = tb.goal - tb.concede;
+            if (netA !== netB) return netB - netA;
+
+            // 規則5：總進球數
+            if (ta.goal !== tb.goal) return tb.goal - ta.goal;
+
+            // 規則6：抽籤
+            return 0;
+        });
+
+        // 5. 生成積分表
+        html += `
+        <div style="margin-bottom:24px;">
+            <h3 style="margin:0 0 8px; font-size:16px; font-weight:bold;">${subgroup} 組積分榜</h3>
+            <table style="width:100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background:#3498db; color:white;">
+                        <th style="border:1px solid #ccc; padding:8px;">排名</th>
+                        <th style="border:1px solid #ccc; padding:8px;">隊伍名稱</th>
+                        <th style="border:1px solid #ccc; padding:8px;">勝</th>
+                        <th style="border:1px solid #ccc; padding:8px;">平</th>
+                        <th style="border:1px solid #ccc; padding:8px;">負</th>
+                        <th style="border:1px solid #ccc; padding:8px;">進球</th>
+                        <th style="border:1px solid #ccc; padding:8px;">失球</th>
+                        <th style="border:1px solid #ccc; padding:8px;">淨勝球</th>
+                        <th style="border:1px solid #ccc; padding:8px;">積分</th>
+                        <th style="border:1px solid #ccc; padding:8px;">棄權次數</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        sortedTeams.forEach((team, index) => {
+            const t = teams[team];
+            html += `
+            <tr style="${index % 2 === 0 ? 'background:#f9f9f9;' : ''}">
+                <td style="border:1px solid #ccc; padding:8px; text-align:center;">${index + 1}</td>
+                <td style="border:1px solid #ccc; padding:8px;">${team}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center;">${t.win}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center;">${t.draw}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center;">${t.lose}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center;">${t.goal}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center;">${t.concede}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center;">${t.goal - t.concede}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center; font-weight:bold; color:#e74c3c;">${t.score}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center; color:${t.forfeitCount > 0 ? '#e74c3c' : '#2ecc71'};">${t.forfeitCount}</td>
             </tr>
+            `;
+        });
+
+        html += `
+                </tbody>
+            </table>
+            <p style="font-size:12px; color:#666; margin-top:4px;">* 棄權按3:0計算；同分時棄權次數少者在前，仍相同則抽籤</p>
+        </div>
         `;
     });
 
-    tableHtml += `</tbody></table>`;
-    contentEl.innerHTML = tableHtml;
+    contentEl.innerHTML = html;
 }
