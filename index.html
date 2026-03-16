@@ -82,7 +82,27 @@
     <button onclick="closeModal('about-modal')">關閉</button>
   </div>
 </div>
-<!-- privacy-modal 和 disclaimer-modal 省略，類似寫法 -->
+
+    <!-- Privacy Policy Modal -->
+<div id="privacy-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h2>隱私政策</h2>
+    <p>我們尊重您的隱私，不會收集或分享任何個人資訊。本網站僅展示公開足球賽事資料，不設用戶註冊、評論、跟蹤等功能。如有第三方連結，請參閱其各自的隱私政策。</p>
+    <button onclick="closeModal('privacy-modal')">關閉</button>
+  </div>
+</div>
+
+<!-- Disclaimer Modal -->
+<div id="disclaimer-modal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h2>免責聲明</h2>
+    <p>本網站資訊僅供參考，所有最終賽果與資料請以官方公佈為準。<br>
+      網頁內容如有錯漏或時間延遲，恕不負任何法律責任。</p>
+    <button onclick="closeModal('disclaimer-modal')">關閉</button>
+  </div>
+</div>
+
+    
 
 <script>
 function showModal(id) {
