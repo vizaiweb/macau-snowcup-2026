@@ -93,10 +93,14 @@ main {
     background-color: #d5e8f3;
 }
 
-/* 內容區域 */
+/* 內容區域 - 关键修改：去掉overflow-x，避免滚动条 */
 .tab-content {
     min-height: 300px;
     padding: 10px;
+    width: 100%;
+    max-width: 1300px;
+    margin: auto;
+    /* 移除 overflow-x: auto，彻底去掉横向滚动条 */
 }
 
 .loading {
@@ -106,29 +110,41 @@ main {
     font-size: 1.2rem;
 }
 
-/* 表格樣式 */
+/* 表格樣式 - 核心优化：适配屏幕，去掉滚动条 */
 table {
     width: 100%;
     border-collapse: collapse;
     margin: 15px 0;
+    background: #fff;
+    /* 让表格宽度强制适配父容器 */
+    table-layout: fixed;
 }
 
 th, td {
     padding: 12px 15px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    /* 关键1：允许文字换行，避免撑大表格 */
+    white-space: normal;
+    /* 关键2：自动换行 + 超出显示省略号（可选，根据需求） */
+    word-wrap: break-word;
+    word-break: break-all;
+    /* 移除 min-width，避免强制固定宽度 */
 }
 
 th {
     background-color: #3498db;
     color: white;
+    /* 表头文字也允许换行 */
+    white-space: normal;
 }
 
 tr:hover {
     background-color: #f8f9fa;
 }
 
-/* 響應式調整 */
+/* 響應式調整 - 增强表格适配 */
 @media (max-width: 768px) {
     header h1 {
         font-size: 2rem;
@@ -144,6 +160,7 @@ tr:hover {
     
     th, td {
         padding: 8px 10px;
+        /* 移动端进一步缩小内边距，适配窄屏 */
     }
 }
 
@@ -238,32 +255,4 @@ section p {
   color: #3498db;
   text-decoration: underline;
   font-size: 16px;
-}
-
-/* 表格全寬度（自動填滿父容器，不限制最大寬度） */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #fff;
-}
-
-/* 表頭樣式保持原設計 */
-table th, table td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  font-size: 16px;
-}
-
-/* 自動分配欄寬（不壓縮內容） */
-table th, table td {
-  min-width: 80px;
-  white-space: nowrap;
-}
-
-/* 響應式，table區上層容器可調寬度（如下如需調整） */
-.section .tab-content {
-  width: 100%;
-  max-width: 1300px;   /* 可按需求調整到更大 */
-  margin: auto;
-  overflow-x: auto;
 }
