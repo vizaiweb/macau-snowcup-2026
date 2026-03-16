@@ -133,52 +133,82 @@ function renderMatches(group) {
     contentEl.innerHTML = tableHtml;
 }
 
+// 渲染對賽成績 —— 從「對賽安排」表讀取，自動依組別分表
 function renderResults(group) {
-    const contentEl = document.getElementById('results-content');
-    const resultsData = excelData[`${group}_對賽成績`] || [];
+  const contentEl = document.getElementById('results-content');
+  // 直接讀取「對賽安排」的數據
+  const allMatches = excelData[`${group}_對賽安排`] || [];
+  
+  // 只保留「有填比分」的賽事（代表已完賽）
+  const resultsData = allMatches.filter(item => {
+    const score = item['比分'] || '';
+    return score.trim() !== ''; // 有比分才顯示
+  });
 
-    if (resultsData.length === 0) {
-        contentEl.innerHTML = `<div>${group}暫無對賽成績數據</div>`;
-        return;
-    }
+  if (resultsData.length === 0) {
+    contentEl.innerHTML = `<div class="loading">${group}暫無已完賽的對賽成績</div>`;
+    return;
+  }
 
-    let tableHtml = `
-        <table border="1" style="width:100%;border-collapse:collapse;">
-            <thead>
-                <tr style="background:#f0f0f0;">
-                    <th>日期</th>
-                    <th>隊伍A</th>
-                    <th>比分</th>
-                    <th>隊伍B</th>
-                    <th>備註</th>
-                    <th>組別</th>
-                </tr>
-            </thead>
-            <tbody>
+  // 依「組別」分組
+  const grouped = {};
+  resultsData.forEach(item => {
+    const g = item['組別'] || '未分組';
+    if (!grouped[g]) grouped[g] = [];
+    grouped[g].push(item);
+  });
+
+  let html = '';
+
+  // 每個組別產生一張獨立表格
+  Object.keys(grouped).forEach(groupName => {
+    const list = grouped[groupName];
+
+    html += `
+    <div style="margin-bottom:24px;">
+      <h3 style="margin:0 0 8px; font-size:16px; font-weight:bold;">${groupName}</h3>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="background:#4285f4; color:white;">
+            <th style="border:1px solid #ccc; padding:8px;">日期</th>
+            <th style="border:1px solid #ccc; padding:8px;">時間</th>
+            <th style="border:1px solid #ccc; padding:8px;">對賽隊伍A</th>
+            <th style="border:1px solid #ccc; padding:8px;">比分</th>
+            <th style="border:1px solid #ccc; padding:8px;">對賽隊伍B</th>
+            <th style="border:1px solid #ccc; padding:8px;">場地</th>
+          </tr>
+        </thead>
+        <tbody>
     `;
 
-    resultsData.forEach(item => {
-        const date = item['日期'] || '-';
-        const teamA = item['隊伍A'] || '-';
-        const score = item['比分'] || '-';
-        const teamB = item['隊伍B'] || '-';
-        const remark = item['備註'] || '-';
-        const subgroup = item['組別'] || '-';
+    list.forEach(item => {
+      const date = item['日期'] || '-';
+      const time = excelTimeToHHMM(item['時間']);
+      const teamA = item['隊伍A'] || '-';
+      const score = item['比分'] || '-';
+      const teamB = item['隊伍B'] || '-';
+      const venue = item['場地'] || '-';
 
-        tableHtml += `
-            <tr>
-                <td>${date}</td>
-                <td>${teamA}</td>
-                <td>${score}</td>
-                <td>${teamB}</td>
-                <td>${remark}</td>
-                <td>${subgroup}</td>
-            </tr>
-        `;
+      html += `
+        <tr>
+          <td style="border:1px solid #ccc; padding:8px;">${date}</td>
+          <td style="border:1px solid #ccc; padding:8px;">${time}</td>
+          <td style="border:1px solid #ccc; padding:8px;">${teamA}</td>
+          <td style="border:1px solid #ccc; padding:8px; font-weight:bold;">${score}</td>
+          <td style="border:1px solid #ccc; padding:8px;">${teamB}</td>
+          <td style="border:1px solid #ccc; padding:8px;">${venue}</td>
+        </tr>
+      `;
     });
 
-    tableHtml += `</tbody></table>`;
-    contentEl.innerHTML = tableHtml;
+    html += `
+        </tbody>
+      </table>
+    </div>
+    `;
+  });
+
+  contentEl.innerHTML = html;
 }
 
 function renderRankings(group) {
