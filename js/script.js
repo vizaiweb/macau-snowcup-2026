@@ -1,7 +1,7 @@
-// 全局變量（匹配你的Excel路徑）
+// 全局變量（修正後，完全匹配你的文件結構）
 let excelData = {};
-// 你的Excel在根目錄，路徑直接寫文件名（無需/data/）
-const DATA_FILE_PATH = 'matches_data.xlsx'; 
+// 從 js/script.js 出發，要先 ../ 回到根目錄，再進入 data/ 資料夾
+const DATA_FILE_PATH = '../data/matches_data.xlsx'; 
 
 // 頁面加載完成後執行
 document.addEventListener('DOMContentLoaded', function() {
