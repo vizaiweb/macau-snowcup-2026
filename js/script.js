@@ -1,6 +1,6 @@
 // 全局變量（完全匹配你的文件結構）
 let excelData = {};
-const DATA_FILE_PATH = '../data/matches_data.xlsx'; // 關鍵修正！
+const DATA_FILE_PATH = 'matches_data.xlsx';
 
 // 頁面加載完成後執行
 document.addEventListener('DOMContentLoaded', function() {
