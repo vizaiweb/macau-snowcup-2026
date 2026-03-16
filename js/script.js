@@ -1,4 +1,4 @@
-// 全局變量（完全匹配你的文件結構）
+// 全局變量
 let excelData = {};
 const DATA_FILE_PATH = 'matches_data.xlsx';
 
@@ -17,33 +17,24 @@ function excelTimeToHHMM(excelTime) {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 }
 
-// ========== 數據加載核心函數 ==========
+// ========== 數據加載 ==========
 function loadExcelData() {
-    console.log('🔍 嘗試加載 Excel：', DATA_FILE_PATH);
-
     fetch(DATA_FILE_PATH + '?t=' + new Date().getTime())
         .then(response => {
-            console.log('🔍 服務器響應狀態：', response.status);
             if (!response.ok) throw new Error(`文件加載失敗（狀態碼：${response.status}）`);
             return response.arrayBuffer();
         })
         .then(data => {
-            console.log('✅ Excel 加載成功，大小：', data.byteLength, '字節');
             const workbook = XLSX.read(data, { type: 'array' });
-            console.log('📋 Excel 所有分頁：', workbook.SheetNames);
-
             workbook.SheetNames.forEach(sheetName => {
                 excelData[sheetName] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-                console.log(`✅ 加載分頁「${sheetName}」，數據行數：`, excelData[sheetName].length);
             });
-
             renderMatches('初級組');
             renderResults('初級組');
             renderRankings('初級組');
             document.getElementById('update-time').textContent = new Date().toLocaleString('zh-Hant-MO');
         })
         .catch(error => {
-            console.error('❌ 加載錯誤：', error.message);
             const errorHtml = `
             <div style="padding:20px; color:#e74c3c; text-align:center;">
                 <h4>數據加載失敗！</h4>
@@ -58,7 +49,6 @@ function loadExcelData() {
 
 // ========== 事件綁定 ==========
 function bindAllEvents() {
-    // 對賽安排選項卡
     document.querySelectorAll('#matches .tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const group = this.dataset.group;
@@ -67,7 +57,6 @@ function bindAllEvents() {
         });
     });
 
-    // 對賽成績選項卡
     document.querySelectorAll('#results .tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const group = this.dataset.group;
@@ -76,7 +65,6 @@ function bindAllEvents() {
         });
     });
 
-    // 積分榜選項卡
     document.querySelectorAll('#rankings .tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const group = this.dataset.group;
@@ -85,7 +73,6 @@ function bindAllEvents() {
         });
     });
 
-    // 頂部導航
     document.querySelectorAll('nav a').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
@@ -96,7 +83,6 @@ function bindAllEvents() {
     });
 }
 
-// 選項卡切換
 function switchTab(btn, sectionId) {
     document.querySelectorAll(`${sectionId} .tab-btn`).forEach(tab => tab.classList.remove('active'));
     btn.classList.add('active');
@@ -158,26 +144,20 @@ function renderMatches(group) {
     contentEl.innerHTML = tableHtml;
 }
 
-// ========== 渲染對賽成績 ==========
+// ========== 渲染對賽成績（顯示所有場次！） ==========
 function renderResults(group) {
     const contentEl = document.getElementById('results-content');
     const sheetName = `${group}_對賽安排`;
     const matchesData = excelData[sheetName] || [];
 
-    // 只篩選已完賽的賽事（標準 1-0 2-2 格式）
-    const finishedMatches = matchesData.filter(item => {
-        const score = item['比分'];
-        return typeof score === 'string' && /^\d+-\d+$/.test(score.trim());
-    });
-
-    if (finishedMatches.length === 0) {
-        contentEl.innerHTML = `<div class="loading">${group}暫無已完賽賽事</div>`;
+    if (matchesData.length === 0) {
+        contentEl.innerHTML = `<div class="loading">${group}暫無對賽數據</div>`;
         return;
     }
 
-    // 按組別分表
+    // 按組別分類全部賽事（不論有沒有比數）
     const grouped = {};
-    finishedMatches.forEach(item => {
+    matchesData.forEach(item => {
         const subgroup = item['組別'] || '未分組';
         if (!grouped[subgroup]) grouped[subgroup] = [];
         grouped[subgroup].push(item);
@@ -221,13 +201,13 @@ function renderResults(group) {
     contentEl.innerHTML = html;
 }
 
-// ========== 渲染積分榜 ==========
+// ========== 渲染積分榜（不顯示"補賽 組"） ==========
 function renderRankings(group) {
     const contentEl = document.getElementById('rankings-content');
     const sheetName = `${group}_對賽安排`;
     const matchesData = excelData[sheetName] || [];
 
-    // 收集所有隊伍（即使沒比數）
+    // 收集所有隊伍
     const groupStats = {};
     matchesData.forEach(item => {
         const teamA = item['隊伍A'] || '-';
@@ -239,13 +219,12 @@ function renderRankings(group) {
         if (!groupStats[subgroup][teamB]) groupStats[subgroup][teamB] = initStats();
     });
 
-    // 對有比數的場次進行積分統計
+    // 計算已完賽積分
     matchesData.forEach(item => {
         const teamA = item['隊伍A'] || '-';
         const teamB = item['隊伍B'] || '-';
         const subgroup = item['組別'] || '未分組';
         const score = item['比分'];
-        // 僅計算標準比數（數字-數字）
         if (typeof score === 'string' && /^\d+-\d+$/.test(score.trim())) {
             const [scoreA, scoreB] = score.trim().split('-').map(Number);
             groupStats[subgroup][teamA].goal += scoreA;
@@ -272,6 +251,8 @@ function renderRankings(group) {
 
     let html = '';
     Object.keys(groupStats).forEach(subgroup => {
+        if (subgroup === '補賽 組') return; // 跳過補賽組
+
         const sortedTeams = Object.keys(groupStats[subgroup]).sort((a, b) => {
             const ta = groupStats[subgroup][a], tb = groupStats[subgroup][b];
             if (tb.score !== ta.score) return tb.score - ta.score;
