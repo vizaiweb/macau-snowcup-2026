@@ -1,16 +1,14 @@
-// 全局變量（修正後，完全匹配你的文件結構）
+// 全局變量（完全匹配你的文件結構）
 let excelData = {};
-// 從 js/script.js 出發，要先 ../ 回到根目錄，再進入 data/ 資料夾
-const DATA_FILE_PATH = '../data/matches_data.xlsx'; 
+const DATA_FILE_PATH = '../data/matches_data.xlsx'; // 關鍵修正！
 
 // 頁面加載完成後執行
 document.addEventListener('DOMContentLoaded', function() {
-    loadExcelData(); // 加載數據
-    bindAllEvents(); // 綁定事件
+    loadExcelData();
+    bindAllEvents();
 });
 
 // ========== 工具函數 ==========
-// 時間格式轉換（匹配Excel時間格式）
 function excelTimeToHHMM(excelTime) {
     if (typeof excelTime !== 'number') return excelTime || '-';
     const totalMinutes = Math.round(excelTime * 24 * 60);
@@ -19,26 +17,26 @@ function excelTimeToHHMM(excelTime) {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 }
 
-// ========== 數據加載（100%匹配你的Excel） ==========
+// ========== 數據加載核心函數（不變，只是路徑已修正） ==========
 function loadExcelData() {
-    console.log('🔍 開始加載Excel：', DATA_FILE_PATH);
+    console.log('🔍 嘗試加載 Excel：', DATA_FILE_PATH);
     
     fetch(DATA_FILE_PATH + '?t=' + new Date().getTime())
         .then(response => {
+            console.log('🔍 服務器響應狀態：', response.status);
             if (!response.ok) throw new Error(`文件加載失敗（狀態碼：${response.status}）`);
             return response.arrayBuffer();
         })
         .then(data => {
+            console.log('✅ Excel 加載成功，大小：', data.byteLength, '字節');
             const workbook = XLSX.read(data, { type: 'array' });
-            console.log('✅ Excel加載成功！包含分頁：', workbook.SheetNames);
+            console.log('📋 Excel 所有分頁：', workbook.SheetNames);
 
-            // 讀取所有分頁數據（匹配你的4個組別）
             workbook.SheetNames.forEach(sheetName => {
                 excelData[sheetName] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-                console.log(`📋 分頁「${sheetName}」數據行數：`, excelData[sheetName].length);
+                console.log(`✅ 加載分頁「${sheetName}」，數據行數：`, excelData[sheetName].length);
             });
 
-            // 初始化渲染（只渲染有數據的初級組）
             renderMatches('初級組');
             renderResults('初級組');
             renderRankings('初級組');
@@ -46,12 +44,11 @@ function loadExcelData() {
         })
         .catch(error => {
             console.error('❌ 加載錯誤：', error.message);
-            // 錯誤提示（告訴用戶路徑問題）
             const errorHtml = `
             <div style="padding:20px; color:#e74c3c; text-align:center;">
-                <h4>Excel加載失敗！</h4>
-                <p>請確認：1. 文件名叫 matches_data.xlsx 2. 和 index.html 放在同一文件夾</p>
+                <h4>數據加載失敗！</h4>
                 <p>錯誤詳情：${error.message}</p>
+                <p>請確認 Excel 路徑：${DATA_FILE_PATH}</p>
             </div>`;
             document.querySelectorAll('#matches-content, #results-content, #rankings-content').forEach(el => {
                 el.innerHTML = errorHtml;
