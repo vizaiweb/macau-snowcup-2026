@@ -152,7 +152,7 @@ tr:hover {
     white-space: nowrap !important;
 }
 
-/* 積分榜列寬：隊伍名稱優先 */
+/* 積分榜列寬：隊伍名稱優先（默認） */
 #rankings-content table th:nth-child(2),
 #rankings-content table td:nth-child(2) {
     min-width: 160px !important;
@@ -247,7 +247,7 @@ footer a:hover {
     }
 }
 
-/* 手機豎屏：完全恢復你原本想要的效果 */
+/* 手機豎屏：最終調整（僅改積分榜寬度） */
 @media (max-width: 480px) and (orientation: portrait) {
     header h1 {
         font-size: 1.8rem;
@@ -269,7 +269,7 @@ footer a:hover {
         font-size: 11px !important;
     }
 
-    /* 對賽安排：隊伍寬度對齊對賽成績 + 橫向滾動 */
+    /* 對賽安排：隊伍寬度對齊對賽成績 + 橫向滾動（不變） */
     #matches-content {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
@@ -287,7 +287,7 @@ footer a:hover {
         width: 25% !important;
     }
 
-    /* 積分榜：恢復橫向滾動條（你原本有的）*/
+    /* 積分榜：橫向滾動 + 寬度縮減（核心修改） */
     #rankings-content {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
@@ -297,8 +297,31 @@ footer a:hover {
         min-width: 600px !important;
         table-layout: fixed !important;
     }
+    /* 積分榜隊伍名稱：原30% → 減20% = 24% */
+    #rankings-content table th:nth-child(2),
+    #rankings-content table td:nth-child(2) {
+        width: 24% !important;
+        min-width: 128px !important; /* 原160px減20% = 128px */
+    }
+    /* 積分榜其他列：原寬度減30%（排名/勝/平/負/進球/失球/積分） */
+    #rankings-content table th:nth-child(1),
+    #rankings-content table td:nth-child(1),
+    #rankings-content table th:nth-child(3),
+    #rankings-content table td:nth-child(3),
+    #rankings-content table th:nth-child(4),
+    #rankings-content table td:nth-child(4),
+    #rankings-content table th:nth-child(5),
+    #rankings-content table td:nth-child(5),
+    #rankings-content table th:nth-child(6),
+    #rankings-content table td:nth-child(6),
+    #rankings-content table th:nth-child(7),
+    #rankings-content table td:nth-child(7),
+    #rankings-content table th:nth-child(8),
+    #rankings-content table td:nth-child(8) {
+        width: calc((100% - 24%)/7 * 0.7) !important;
+    }
 
-    /* 對賽成績：保持原狀，不開啟橫向滾動 */
+    /* 對賽成績：完全不動（不變） */
     #results-content {
         overflow-x: hidden !important;
     }
