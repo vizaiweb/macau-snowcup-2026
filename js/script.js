@@ -168,15 +168,15 @@ function renderResults(group) {
         html += `
         <div style="margin-bottom:24px;">
             <h3 style="margin:0 0 8px; font-size:16px; font-weight:bold;">${subgroup} 組 - 對賽成績</h3>
-            <table style="width:100%; border-collapse:collapse;">
+            <table style="width:100%; border-collapse:collapse; table-layout:fixed;">
                 <thead>
                     <tr style="background:#3498db; color:white;">
-                        <th style="border:1px solid #ccc; padding:8px;">日期</th>
-                        <th style="border:1px solid #ccc; padding:8px;">時間</th>
-                        <th style="border:1px solid #ccc; padding:8px;">隊伍A</th>
-                        <th style="border:1px solid #ccc; padding:8px;">比分</th>
-                        <th style="border:1px solid #ccc; padding:8px;">隊伍B</th>
-                        <th style="border:1px solid #ccc; padding:8px;">場地</th>
+                        <th style="border:1px solid #ccc; padding:8px; width:12%; white-space:nowrap;">日期</th>
+                        <th style="border:1px solid #ccc; padding:8px; width:12%; white-space:nowrap;">時間</th>
+                        <th style="border:1px solid #ccc; padding:8px; width:25%; white-space:nowrap;">隊伍A</th>
+                        <th style="border:1px solid #ccc; padding:8px; width:14%; white-space:nowrap;">比分</th>
+                        <th style="border:1px solid #ccc; padding:8px; width:25%; white-space:nowrap;">隊伍B</th>
+                        <th style="border:1px solid #ccc; padding:8px; width:12%; white-space:nowrap;">場地</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -185,12 +185,12 @@ function renderResults(group) {
         grouped[subgroup].forEach(item => {
             html += `
             <tr>
-                <td style="border:1px solid #ccc; padding:8px;">${item['日期'] || '-'}</td>
-                <td style="border:1px solid #ccc; padding:8px;">${excelTimeToHHMM(item['時間'])}</td>
-                <td style="border:1px solid #ccc; padding:8px;">${item['隊伍A'] || '-'}</td>
-                <td style="border:1px solid #ccc; padding:8px; font-weight:bold;">${item['比分'] || '-'}</td>
-                <td style="border:1px solid #ccc; padding:8px;">${item['隊伍B'] || '-'}</td>
-                <td style="border:1px solid #ccc; padding:8px;">${item['場地'] || '-'}</td>
+                <td style="border:1px solid #ccc; padding:8px; white-space:nowrap;">${item['日期'] || '-'}</td>
+                <td style="border:1px solid #ccc; padding:8px; white-space:nowrap;">${excelTimeToHHMM(item['時間'])}</td>
+                <td style="border:1px solid #ccc; padding:8px; white-space:nowrap;">${item['隊伍A'] || '-'}</td>
+                <td style="border:1px solid #ccc; padding:8px; font-weight:bold; white-space:nowrap;">${item['比分'] || '-'}</td>
+                <td style="border:1px solid #ccc; padding:8px; white-space:nowrap;">${item['隊伍B'] || '-'}</td>
+                <td style="border:1px solid #ccc; padding:8px; white-space:nowrap;">${item['場地'] || '-'}</td>
             </tr>
             `;
         });
@@ -261,17 +261,17 @@ function renderRankings(group) {
         html += `
         <div style="margin-bottom:24px;">
             <h3 style="margin:0 0 8px; font-size:16px; font-weight:bold;">${subgroup} 組 - 積分榜</h3>
-            <table style="width:100%; border-collapse:collapse;">
+            <table style="width:100%; border-collapse:collapse; table-layout:auto;">
                 <thead>
                     <tr style="background:#3498db; color:white;">
-                        <th style="border:1px solid #ccc; padding:8px;">排名</th>
-                        <th style="border:1px solid #ccc; padding:8px;">隊伍名稱</th>
-                        <th style="border:1px solid #ccc; padding:8px;">勝</th>
-                        <th style="border:1px solid #ccc; padding:8px;">平</th>
-                        <th style="border:1px solid #ccc; padding:8px;">負</th>
-                        <th style="border:1px solid #ccc; padding:8px;">進球</th>
-                        <th style="border:1px solid #ccc; padding:8px;">失球</th>
-                        <th style="border:1px solid #ccc; padding:8px;">積分</th>
+                        <th style="border:1px solid #ccc; padding:8px; min-width:60px; width:8%; white-space:nowrap;">排名</th>
+                        <th style="border:1px solid #ccc; padding:8px; min-width:160px; width:30%; white-space:nowrap;">隊伍名稱</th>
+                        <th style="border:1px solid #ccc; padding:8px; min-width:40px; width:8%; white-space:nowrap;">勝</th>
+                        <th style="border:1px solid #ccc; padding:8px; min-width:40px; width:8%; white-space:nowrap;">平</th>
+                        <th style="border:1px solid #ccc; padding:8px; min-width:40px; width:8%; white-space:nowrap;">負</th>
+                        <th style="border:1px solid #ccc; padding:8px; min-width:40px; width:8%; white-space:nowrap;">進球</th>
+                        <th style="border:1px solid #ccc; padding:8px; min-width:40px; width:8%; white-space:nowrap;">失球</th>
+                        <th style="border:1px solid #ccc; padding:8px; min-width:50px; width:10%; white-space:nowrap;">積分</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -280,14 +280,14 @@ function renderRankings(group) {
             const t = groupStats[subgroup][team];
             html += `
             <tr style="${index % 2 === 0 ? 'background:#f9f9f9;' : ''}">
-                <td style="border:1px solid #ccc; padding:8px; text-align:center;">${index + 1}</td>
-                <td style="border:1px solid #ccc; padding:8px;">${team}</td>
-                <td style="border:1px solid #ccc; padding:8px; text-align:center;">${t.win}</td>
-                <td style="border:1px solid #ccc; padding:8px; text-align:center;">${t.draw}</td>
-                <td style="border:1px solid #ccc; padding:8px; text-align:center;">${t.lose}</td>
-                <td style="border:1px solid #ccc; padding:8px; text-align:center;">${t.goal}</td>
-                <td style="border:1px solid #ccc; padding:8px; text-align:center;">${t.concede}</td>
-                <td style="border:1px solid #ccc; padding:8px; text-align:center; font-weight:bold; color:#e74c3c;">${t.score}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center; white-space:nowrap;">${index + 1}</td>
+                <td style="border:1px solid #ccc; padding:8px; white-space:nowrap;">${team}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center; white-space:nowrap;">${t.win}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center; white-space:nowrap;">${t.draw}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center; white-space:nowrap;">${t.lose}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center; white-space:nowrap;">${t.goal}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center; white-space:nowrap;">${t.concede}</td>
+                <td style="border:1px solid #ccc; padding:8px; text-align:center; font-weight:bold; color:#e74c3c; white-space:nowrap;">${t.score}</td>
             </tr>
             `;
         });
