@@ -32,7 +32,9 @@ function loadExcelData() {
             renderMatches('初級組');
             renderResults('初級組');
             renderRankings('初級組');
-            document.getElementById('update-time').textContent = new Date().toLocaleString('zh-Hant-MO');
+            // 手動設置最後 commit 的時間（你可根據實際提交時間修改）
+            const LAST_COMMIT_TIME = new Date('2026-03-17 11:27:40');
+            document.getElementById('update-time').textContent = LAST_COMMIT_TIME.toLocaleString('zh-Hant-MO');
         })
         .catch(error => {
             const errorHtml = `
