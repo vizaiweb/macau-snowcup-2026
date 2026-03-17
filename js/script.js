@@ -262,7 +262,7 @@ function renderRankings(group) {
 
     let html = '';
     Object.keys(groupStats).forEach(subgroup => {
-        if (subgroup === '補賽 組') return;
+        if (subgroup === '補賽') return;
 
         const sortedTeams = Object.keys(groupStats[subgroup]).sort((a, b) => {
             const ta = groupStats[subgroup][a], tb = groupStats[subgroup][b];
