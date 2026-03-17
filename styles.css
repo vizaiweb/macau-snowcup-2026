@@ -1,4 +1,4 @@
-/* 全局樣式重置與基礎設置 */
+/* 全局樣式 */
 * {
     margin: 0;
     padding: 0;
@@ -12,7 +12,6 @@ body {
     line-height: 1.6;
 }
 
-/* 頁頭樣式 */
 header {
     background-color: #2c3e50;
     color: white;
@@ -30,7 +29,6 @@ nav ul {
     justify-content: center;
     list-style: none;
     gap: 30px;
-    flex-wrap: wrap;
 }
 
 nav a {
@@ -42,12 +40,10 @@ nav a {
     transition: background-color 0.3s;
 }
 
-nav a.nav-active,
-nav a:hover {
+nav a:hover, nav a.nav-active {
     background-color: #3498db;
 }
 
-/* 主內容區域 */
 main {
     max-width: 1200px;
     margin: 30px auto;
@@ -99,67 +95,83 @@ main {
     background-color: #d5e8f3;
 }
 
-/* 內容區域基礎樣式 */
 .tab-content {
     min-height: 300px;
     padding: 10px 0;
     width: 100%;
-    margin: 0;
-    overflow-x: hidden;
-}
-
-/* 加載中樣式 */
-.loading {
-    padding: 20px;
-    text-align: center;
-    color: #666;
-    font-size: 1.1rem;
+    overflow-x: auto; /* 允許橫向捲動，避免內容擠壓 */
 }
 
 /* 表格通用樣式 */
 table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    margin: 15px 0 !important;
-    background: #fff !important;
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    min-width: 600px; /* 防止過度壓縮 */
 }
 
 th, td {
-    padding: 8px 6px !important;
-    text-align: center !important;
-    border: 1px solid #ccc !important;
-    font-size: 16px !important;
-    line-height: 1.4 !important;
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    white-space: nowrap;
 }
 
 th {
-    background-color: #3498db !important;
-    color: white !important;
-    font-size: 15px !important;
-    white-space: nowrap !important;
+    background-color: #3498db;
+    color: white;
+    font-size: 15px;
 }
 
 tr:hover {
-    background-color: #f8f9fa !important;
+    background-color: #f8f9fa;
 }
 
-/* 對賽成績表列寬：隊伍A/B等寬 */
-#results-content table th:nth-child(3),
-#results-content table td:nth-child(3),
-#results-content table th:nth-child(5),
-#results-content table td:nth-child(5) {
-    width: 25% !important;
-    white-space: nowrap !important;
+/* 積分榜特殊列寬 (與原本一致) */
+table.leaderboard th:nth-child(1),
+table.leaderboard td:nth-child(1) { min-width: 60px; width: 8%; }
+table.leaderboard th:nth-child(2),
+table.leaderboard td:nth-child(2) { min-width: 160px; width: 30%; }
+table.leaderboard th:nth-child(3),
+table.leaderboard td:nth-child(3),
+table.leaderboard th:nth-child(4),
+table.leaderboard td:nth-child(4),
+table.leaderboard th:nth-child(5),
+table.leaderboard td:nth-child(5),
+table.leaderboard th:nth-child(6),
+table.leaderboard td:nth-child(6),
+table.leaderboard th:nth-child(7),
+table.leaderboard td:nth-child(7) { min-width: 40px; width: 8%; }
+table.leaderboard th:nth-child(8),
+table.leaderboard td:nth-child(8) { min-width: 50px; width: 10%; }
+
+/* 手機響應式 */
+@media (max-width: 900px) and (orientation: landscape) {
+    header h1 { font-size: 2rem; }
+    .tabs { flex-direction: column; }
+    th, td { font-size: 14px; }
 }
 
-/* 積分榜列寬：默認自適應 */
-#rankings-content table th:nth-child(2),
-#rankings-content table td:nth-child(2) {
-    white-space: nowrap !important;
-    max-width: 200px !important; /* 上限，避免過寬 */
+@media (max-width: 480px) {
+    th, td { font-size: 12px; padding: 6px 3px; }
+    table.leaderboard th:nth-child(2),
+    table.leaderboard td:nth-child(2) { min-width: 130px; width: 35%; }
+    table.leaderboard th:nth-child(1),
+    table.leaderboard td:nth-child(1) { min-width: 40px; width: 7%; }
+    table.leaderboard th:nth-child(3),
+    table.leaderboard td:nth-child(3),
+    table.leaderboard th:nth-child(4),
+    table.leaderboard td:nth-child(4),
+    table.leaderboard th:nth-child(5),
+    table.leaderboard td:nth-child(5),
+    table.leaderboard th:nth-child(6),
+    table.leaderboard td:nth-child(6),
+    table.leaderboard th:nth-child(7),
+    table.leaderboard td:nth-child(7) { min-width: 30px; width: 7%; }
+    table.leaderboard th:nth-child(8),
+    table.leaderboard td:nth-child(8) { min-width: 40px; width: 9%; }
 }
 
-/* 頁腳樣式 */
 footer {
     text-align: center;
     margin-top: 40px;
@@ -169,154 +181,44 @@ footer {
     background: #f8f8f8;
     border-top: 1px solid #e0e0e0;
 }
-
 footer a {
     color: #3498db;
     text-decoration: none;
     margin: 0 8px;
 }
+footer a:hover { text-decoration: underline; }
 
-footer a:hover {
-    text-decoration: underline;
+/* 載入提示 */
+.loading {
+    padding: 40px;
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 1.2rem;
 }
 
-/* Modal (彈窗) 樣式 */
+/* 模態框樣式 */
 .modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.25);
-    display: none;
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
 }
-
-.modal.show {
-    display: flex;
-}
-
 .modal-content {
-    background: #fff;
-    padding: 2em 1.4em;
+    position: relative;
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 500px;
     border-radius: 8px;
-    max-width: 380px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
-    text-align: left;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
-
-.modal-content h2 {
-    margin-top: 0;
-}
-
 .modal-content button {
-    margin-top: 16px;
+    margin-top: 15px;
     padding: 8px 16px;
+    background-color: #3498db;
+    color: white;
     border: none;
-    background: #3498db;
-    color: #fff;
     border-radius: 4px;
     cursor: pointer;
-}
-
-.modal-content button:hover {
-    background: #217dbb;
-}
-
-/* ========== 響應式優化 ========== */
-/* 平板/手機橫屏 */
-@media (max-width: 900px) and (orientation: landscape) {
-    header h1 {
-        font-size: 2rem;
-    }
-
-    .tabs {
-        flex-direction: column;
-    }
-
-    th, td {
-        padding: 6px 4px !important;
-        font-size: 14px !important;
-    }
-
-    th {
-        font-size: 13px !important;
-    }
-}
-
-/* 手機豎屏：完全自適應，無固定寬度 */
-@media (max-width: 480px) and (orientation: portrait) {
-    header h1 {
-        font-size: 1.8rem;
-    }
-    nav ul {
-        gap: 15px;
-    }
-    nav a {
-        font-size: 1rem;
-    }
-    .section {
-        padding: 15px;
-    }
-    th, td {
-        padding: 5px 3px !important;
-        font-size: 12px !important;
-    }
-    th {
-        font-size: 11px !important;
-    }
-
-    /* 對賽安排：隊伍寬度對齊對賽成績 + 橫向滾動 */
-    #matches-content {
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        padding: 5px 0 !important;
-    }
-    #matches-content table {
-        table-layout: auto !important; /* 自適應內容 */
-        min-width: auto !important; /* 取消固定最小寬度 */
-    }
-    #matches-content table th:nth-child(3),
-    #matches-content table td:nth-child(3),
-    #matches-content table th:nth-child(4),
-    #matches-content table td:nth-child(4) {
-        white-space: nowrap !important;
-        max-width: 180px !important; /* 上限，避免過寬 */
-    }
-
-    /* 積分榜：核心自適應邏輯（重點） */
-    #rankings-content {
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        padding: 5px 0 !important;
-    }
-    #rankings-content table {
-        table-layout: auto !important; /* 讓表格根據內容自適應所有手機屏幕 */
-        min-width: auto !important; /* 取消固定最小寬度，隨屏幕變 */
-        width: 100% !important;
-    }
-    /* 積分榜隊伍名稱：自適應 + 上限 + 不換行 + 溢出省略（極端情況） */
-    #rankings-content table th:nth-child(2),
-    #rankings-content table td:nth-child(2) {
-        white-space: nowrap !important;
-        max-width: calc(100vw - 300px) !important; /* 動態計算：屏幕寬度 - 其他列總寬 */
-        overflow: hidden !important;
-        text-overflow: ellipsis !important; /* 極端長名稱顯示...，不越界 */
-        text-align: left !important; /* 左對齊，盡量顯示更多文字 */
-        padding-left: 8px !important;
-    }
-    /* 積分榜其他列：自適應內容寬度，不擠壓 */
-    #rankings-content table th:not(:nth-child(2)),
-    #rankings-content table td:not(:nth-child(2)) {
-        white-space: nowrap !important;
-        max-width: 60px !important; /* 上限，避免過寬 */
-        width: auto !important; /* 隨內容自適應 */
-    }
-
-    /* 對賽成績：保持不動 */
-    #results-content {
-        overflow-x: hidden !important;
-    }
 }
