@@ -30,7 +30,7 @@ nav ul {
     justify-content: center;
     list-style: none;
     gap: 30px;
-    flex-wrap: wrap; /* 手機端導航欄自動換行 */
+    flex-wrap: wrap;
 }
 
 nav a {
@@ -76,7 +76,7 @@ main {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
-    flex-wrap: wrap; /* 手機端選項卡自動換行 */
+    flex-wrap: wrap;
 }
 
 .tab-btn {
@@ -105,7 +105,7 @@ main {
     padding: 10px 0;
     width: 100%;
     margin: 0;
-    overflow-x: hidden; /* 默認禁用橫向滾動 */
+    overflow-x: hidden;
 }
 
 /* 加載中樣式 */
@@ -116,7 +116,7 @@ main {
     font-size: 1.1rem;
 }
 
-/* 表格通用樣式（覆蓋JS內聯樣式） */
+/* 表格通用樣式 */
 table {
     width: 100% !important;
     border-collapse: collapse !important;
@@ -226,15 +226,6 @@ footer a:hover {
     background: #217dbb;
 }
 
-/* 回主頁連結（備用） */
-.back-link {
-    display: inline-block;
-    margin-top: 24px;
-    color: #3498db;
-    text-decoration: underline;
-    font-size: 16px;
-}
-
 /* ========== 響應式優化 ========== */
 /* 平板/手機橫屏 */
 @media (max-width: 900px) and (orientation: landscape) {
@@ -243,7 +234,7 @@ footer a:hover {
     }
 
     .tabs {
-        flex-direction: column; /* 選項卡豎排 */
+        flex-direction: column;
     }
 
     th, td {
@@ -254,23 +245,16 @@ footer a:hover {
     th {
         font-size: 13px !important;
     }
-
-    /* 橫屏禁用滾動條 */
-    #matches-content,
-    #results-content,
-    #rankings-content {
-        overflow-x: hidden !important;
-    }
 }
 
-/* 手機豎屏（核心：開啟橫向滾動） */
+/* 手機豎屏：僅修改對賽安排表格 */
 @media (max-width: 480px) and (orientation: portrait) {
     header h1 {
         font-size: 1.8rem;
     }
 
     nav ul {
-        gap: 15px; /* 導航欄間距縮小 */
+        gap: 15px;
     }
 
     nav a {
@@ -278,7 +262,7 @@ footer a:hover {
     }
 
     .section {
-        padding: 15px; /* 減少內邊距 */
+        padding: 15px;
     }
 
     th, td {
@@ -290,27 +274,30 @@ footer a:hover {
         font-size: 11px !important;
     }
 
-    /* 豎屏開啟橫向滾動 */
-    #matches-content,
-    #results-content,
-    #rankings-content {
+    /* 對賽安排：隊伍名稱自適應最長名稱 + 橫向滾動 */
+    #matches-content {
         overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important; /* iOS 流暢滑動 */
+        -webkit-overflow-scrolling: touch !important;
         padding: 5px 0 !important;
     }
 
-    /* 表格最小寬度，確保內容完整 */
-    #matches-content table,
-    #results-content table,
-    #rankings-content table {
-        min-width: 600px !important;
-        table-layout: fixed !important;
+    #matches-content table {
+        table-layout: auto !important;
+        min-width: 650px !important;
     }
 
-    /* 積分榜隊伍名稱進一步優化 */
-    #rankings-content table th:nth-child(2),
-    #rankings-content table td:nth-child(2) {
+    #matches-content table th:nth-child(3),
+    #matches-content table td:nth-child(3),
+    #matches-content table th:nth-child(4),
+    #matches-content table td:nth-child(4) {
+        white-space: nowrap !important;
         min-width: 140px !important;
-        width: 35% !important;
+        width: auto !important;
+    }
+
+    /* 對賽成績 & 積分榜：保持原樣，不開啟橫向滾動 */
+    #results-content,
+    #rankings-content {
+        overflow-x: hidden !important;
     }
 }
