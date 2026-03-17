@@ -1,224 +1,52 @@
-/* 全局樣式 */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Microsoft JhengHei', 'PingFang SC', sans-serif;
+/* 官方資料 modal 專屬樣式 */
+#official-modal {
+    display: none; /* 預設隱藏 */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0,0,0,0.5) !important;
+    z-index: 1000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: auto; /* 允許背景滾動？不建議，保留 */
 }
 
-body {
-    background-color: #f5f5f5;
-    color: #333;
-    line-height: 1.6;
-}
-
-header {
-    background-color: #2c3e50;
-    color: white;
-    padding: 20px 0;
-    text-align: center;
-}
-
-header h1 {
-    margin-bottom: 15px;
-    font-size: 2.5rem;
-}
-
-nav ul {
-    display: flex;
-    justify-content: center;
-    list-style: none;
-    gap: 30px;
-}
-
-nav a {
-    color: white;
-    text-decoration: none;
-    font-size: 1.1rem;
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-
-nav a:hover, nav a.nav-active {
-    background-color: #3498db;
-}
-
-main {
-    max-width: 1200px;
-    margin: 30px auto;
-    padding: 0 20px;
-    width: 100%;
-}
-
-.section {
-    background-color: white;
-    border-radius: 10px;
-    padding: 25px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    width: 100%;
-}
-
-.section h2 {
-    color: #2c3e50;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #3498db;
-}
-
-/* 選項卡樣式 */
-.tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.tab-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: #ecf0f1;
-    color: #2c3e50;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s;
-}
-
-.tab-btn.active {
-    background-color: #3498db;
-    color: white;
-}
-
-.tab-btn:hover:not(.active) {
-    background-color: #d5e8f3;
-}
-
-.tab-content {
-    min-height: 300px;
-    padding: 10px 0;
-    width: 100%;
-    overflow-x: auto; /* 允許橫向捲動，避免內容擠壓 */
-}
-
-/* 表格通用樣式 */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    min-width: 600px; /* 防止過度壓縮 */
-}
-
-th, td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: center;
-    white-space: nowrap;
-}
-
-th {
-    background-color: #3498db;
-    color: white;
-    font-size: 15px;
-}
-
-tr:hover {
-    background-color: #f8f9fa;
-}
-
-/* 積分榜特殊列寬 (與原本一致) */
-table.leaderboard th:nth-child(1),
-table.leaderboard td:nth-child(1) { min-width: 60px; width: 8%; }
-table.leaderboard th:nth-child(2),
-table.leaderboard td:nth-child(2) { min-width: 160px; width: 30%; }
-table.leaderboard th:nth-child(3),
-table.leaderboard td:nth-child(3),
-table.leaderboard th:nth-child(4),
-table.leaderboard td:nth-child(4),
-table.leaderboard th:nth-child(5),
-table.leaderboard td:nth-child(5),
-table.leaderboard th:nth-child(6),
-table.leaderboard td:nth-child(6),
-table.leaderboard th:nth-child(7),
-table.leaderboard td:nth-child(7) { min-width: 40px; width: 8%; }
-table.leaderboard th:nth-child(8),
-table.leaderboard td:nth-child(8) { min-width: 50px; width: 10%; }
-
-/* 手機響應式 */
-@media (max-width: 900px) and (orientation: landscape) {
-    header h1 { font-size: 2rem; }
-    .tabs { flex-direction: column; }
-    th, td { font-size: 14px; }
-}
-
-@media (max-width: 480px) {
-    th, td { font-size: 12px; padding: 6px 3px; }
-    table.leaderboard th:nth-child(2),
-    table.leaderboard td:nth-child(2) { min-width: 130px; width: 35%; }
-    table.leaderboard th:nth-child(1),
-    table.leaderboard td:nth-child(1) { min-width: 40px; width: 7%; }
-    table.leaderboard th:nth-child(3),
-    table.leaderboard td:nth-child(3),
-    table.leaderboard th:nth-child(4),
-    table.leaderboard td:nth-child(4),
-    table.leaderboard th:nth-child(5),
-    table.leaderboard td:nth-child(5),
-    table.leaderboard th:nth-child(6),
-    table.leaderboard td:nth-child(6),
-    table.leaderboard th:nth-child(7),
-    table.leaderboard td:nth-child(7) { min-width: 30px; width: 7%; }
-    table.leaderboard th:nth-child(8),
-    table.leaderboard td:nth-child(8) { min-width: 40px; width: 9%; }
-}
-
-footer {
-    text-align: center;
-    margin-top: 40px;
-    color: #888;
-    font-size: 15px;
-    padding: 16px 0;
-    background: #f8f8f8;
-    border-top: 1px solid #e0e0e0;
-}
-footer a {
-    color: #3498db;
-    text-decoration: none;
-    margin: 0 8px;
-}
-footer a:hover { text-decoration: underline; }
-
-/* 載入提示 */
-.loading {
-    padding: 40px;
-    text-align: center;
-    color: #7f8c8d;
-    font-size: 1.2rem;
-}
-
-/* 模態框樣式 */
-.modal {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    z-index: 1000;
-}
-.modal-content {
-    position: relative;
-    background-color: #fff;
-    margin: 15% auto;
-    padding: 20px;
-    width: 80%;
-    max-width: 500px;
+#official-modal .modal-content {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    width: 90%;
+    max-width: 1000px;
+    max-height: 90vh;
+    background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* 確保內部滾動 */
 }
-.modal-content button {
-    margin-top: 15px;
-    padding: 8px 16px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+
+#official-modal .modal-header {
+    padding: 15px 20px;
+    background: #f0f0f0;
+    border-bottom: 1px solid #ccc;
+    border-radius: 8px 8px 0 0;
+    flex-shrink: 0;
+}
+
+#official-modal .modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+#official-modal .modal-footer {
+    padding: 15px;
+    border-top: 1px solid #eee;
+    text-align: center;
+    flex-shrink: 0;
 }
