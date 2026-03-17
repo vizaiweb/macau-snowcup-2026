@@ -179,6 +179,9 @@ function renderResults(group) {
 
     let html = '';
     Object.keys(grouped).forEach(subgroup => {
+        // **跳過組別名稱為「補賽」的組**（與積分榜類似，但條件改為 '補賽'）
+        if (subgroup === '補賽') return;
+        
         html += `
         <div style="margin-bottom:24px;">
             <h3 style="margin:0 0 8px; font-size:16px;">${subgroup} 組 - 對賽成績</h3>
