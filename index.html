@@ -1,43 +1,142 @@
-<!-- 官方資料 Modal（修正：固定底部按鈕，中間可滾動） -->
-<div id="official-modal" class="modal" style="display:none;">
-    <div class="modal-content" style="display:flex; flex-direction:column; max-height:80vh; background:white; border-radius:8px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
-        <!-- 標題區域 -->
-        <div style="padding:15px 20px; background:#f0f0f0; border-bottom:1px solid #ccc;">
-            <h2 style="margin:0;">官方資料</h2>
-        </div>
-        <!-- 可滾動內容區域 -->
-        <div style="padding:20px; overflow-y:auto; flex:1;">
-            <p>點擊圖片可查看原始大圖或下載：</p>
-            <ul style="list-style:none; padding:0;">
-                <li style="margin-bottom:20px;">
-                    <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組.jpeg" target="_blank">
-                        <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
-                    </a>
-                    <p style="text-align:center;">澳門工人飛雪杯2026 初級組</p>
-                </li>
-                <li style="margin-bottom:20px;">
-                    <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組對賽時間表.jpeg" target="_blank">
-                        <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組對賽時間表.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
-                    </a>
-                    <p style="text-align:center;">澳門工人飛雪杯2026 初級組對賽時間表</p>
-                </li>
-                <li style="margin-bottom:20px;">
-                    <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/章程.jpeg" target="_blank">
-                        <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/章程.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
-                    </a>
-                    <p style="text-align:center;">章程</p>
-                </li>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>澳門工人飛雪杯2026</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 引入Excel解析庫 -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>澳門工人飛雪杯2026</h1>
+        <nav>
+            <ul>
+                <li><a href="#matches" class="nav-active">對賽安排</a></li>
+                <li><a href="#results">對賽成績</a></li>
+                <li><a href="#rankings">積分榜</a></li>
             </ul>
-            <p style="margin-top:20px;">※ 若圖片無法顯示，請確認：</p>
-            <ul style="margin-top:5px;">
-                <li>GitHub 倉庫是否為<strong>公開</strong>（public）</li>
-                <li>路徑中的 <code>vizaiweb/macau-snowcup-2026</code> 是否正確</li>
-                <li>圖片檔案確實存在於 <code>data</code> 資料夾且檔名完全一致</li>
-            </ul>
-        </div>
-        <!-- 固定底部按鈕 -->
-        <div style="padding:15px; border-top:1px solid #eee; text-align:center;">
-            <button onclick="closeModal('official-modal')">關閉</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- 對賽安排 -->
+        <section id="matches" class="section">
+            <h2>對賽安排</h2>
+            <div class="tabs">
+                <button class="tab-btn active" data-group="初級組">初級組 (76隊)</button>
+                <button class="tab-btn" data-group="高級組">高級組</button>
+                <button class="tab-btn" data-group="中年組">中年組</button>
+                <button class="tab-btn" data-group="元老組">元老組</button>
+            </div>
+            <div class="tab-content" id="matches-content">
+                <div class="loading">加載中...</div>
+            </div>
+        </section>
+
+        <!-- 對賽成績 -->
+        <section id="results" class="section">
+            <h2>對賽成績</h2>
+            <div class="tabs">
+                <button class="tab-btn active" data-group="初級組">初級組 (76隊)</button>
+                <button class="tab-btn" data-group="高級組">高級組</button>
+                <button class="tab-btn" data-group="中年組">中年組</button>
+                <button class="tab-btn" data-group="元老組">元老組</button>
+            </div>
+            <div class="tab-content" id="results-content">
+                <div class="loading">加載中...</div>
+            </div>
+        </section>
+
+        <!-- 積分榜 -->
+        <section id="rankings" class="section">
+            <h2>積分榜</h2>
+            <div class="tabs">
+                <button class="tab-btn active" data-group="初級組">初級組 (76隊)</button>
+                <button class="tab-btn" data-group="高級組">高級組</button>
+                <button class="tab-btn" data-group="中年組">中年組</button>
+                <button class="tab-btn" data-group="元老組">元老組</button>
+            </div>
+            <div class="tab-content" id="rankings-content">
+                <div class="loading">加載中...</div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <a href="#" onclick="showModal('about-modal');return false;">關於</a> | 
+        <a href="#" onclick="showModal('privacy-modal');return false;">隱私政策</a> | 
+        <a href="#" onclick="showModal('disclaimer-modal');return false;">免責聲明</a> |
+        <a href="#" onclick="showModal('official-modal');return false;">官方資料</a>
+        <p>澳門工人飛雪杯2026 - 數據最後更新時間: <span id="update-time">未加載</span></p>
+    </footer>
+
+    <!-- 關於 Modal -->
+    <div id="about-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>關於</h2>
+             <p>
+      本網站為《澳門雪杯足球賽2026》非官方資訊平台，旨在提供比賽賽程、成績、積分等公開資料。<br>
+      所有資訊源於主辦方及相關渠道，歡迎查閱、交流及分享。
+    </p>
+    <!-- 新增聯絡方式 -->
+    <p>聯絡方式：<a href="mailto:vizaiweb@gmail.com">vizaiweb@gmail.com</a></p>
+            <button onclick="closeModal('about-modal')">關閉</button>
         </div>
     </div>
+
+    <!-- 隱私政策 Modal -->
+    <div id="privacy-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>隱私政策</h2>
+            <p>我們尊重您的隱私，不會收集或分享任何個人資訊。本網站僅展示公開足球賽事資料，不設用戶註冊、評論、跟蹤等功能。如有第三方連結，請參閱其各自的隱私政策。</p>
+            <button onclick="closeModal('privacy-modal')">關閉</button>
+        </div>
+    </div>
+
+    <!-- 免責聲明 Modal -->
+    <div id="disclaimer-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>免責聲明</h2>
+            <p>本網站資訊僅供參考，所有最終賽果與資料請以官方公佈為準。<br>網頁內容如有錯漏或時間延遲，恕不負任何法律責任。</p>
+            <button onclick="closeModal('disclaimer-modal')">關閉</button>
+        </div>
+    </div>
+
+<!-- 官方資料 Modal（請將下方 raw.githubusercontent.com 連結中的 username/repo 改為您的實際路徑） -->
+<div id="official-modal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
+        <h2>官方資料</h2>
+        <p>點擊圖片可查看原始大圖或下載：</p>
+        <ul style="list-style:none; padding:0;">
+            <li style="margin-bottom:20px;">
+                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組.jpeg" target="_blank">
+                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
+                </a>
+                <p style="text-align:center;">澳門工人飛雪杯2026 初級組</p>
+            </li>
+            <li style="margin-bottom:20px;">
+                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組對賽時間表.jpeg" target="_blank">
+                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組對賽時間表.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
+                </a>
+                <p style="text-align:center;">澳門工人飛雪杯2026 初級組對賽時間表</p>
+            </li>
+            <li style="margin-bottom:20px;">
+                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/章程.jpeg" target="_blank">
+                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/章程.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
+                </a>
+                <p style="text-align:center;">章程</p>
+            </li>
+        
+        <button onclick="closeModal('official-modal')" style="display:block; margin:20px auto 0;">關閉</button>
+    </div>
 </div>
+
+    <script>
+        function showModal(id) { document.getElementById(id).style.display = "block"; }
+        function closeModal(id) { document.getElementById(id).style.display = "none"; }
+    </script>
+    <script src="js/script.js"></script>
+</body>
+</html>
