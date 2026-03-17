@@ -1,6 +1,6 @@
 // 全局變量
 let excelData = {};
-const DATA_FILE_PATH = 'matches_data.xlsx';  // 確認檔案位置正確
+const DATA_FILE_PATH = 'matches_data.xlsx';
 
 // 頁面載入
 document.addEventListener('DOMContentLoaded', function() {
@@ -17,16 +17,35 @@ function excelTimeToHHMM(excelTime) {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
 }
 
-// ========== 數據加載（強化錯誤處理） ==========
+// ========== 數據加載（動態取得最後修改時間） ==========
 function loadExcelData() {
     fetch(DATA_FILE_PATH + '?t=' + Date.now())
         .then(response => {
             if (!response.ok) {
-                // 嘗試讀取回應內容以便診斷
                 return response.text().then(text => {
                     throw new Error(`HTTP ${response.status} ${response.statusText} - 回應內容開頭: ${text.substring(0, 100)}`);
                 });
             }
+
+            // 取得檔案的 Last-Modified 時間
+            const lastModified = response.headers.get('last-modified');
+            if (lastModified) {
+                const lastModifiedDate = new Date(lastModified);
+                // 格式化為澳門/香港慣用格式（例如 17/3/2026 上午11:27:40）
+                document.getElementById('update-time').textContent = lastModifiedDate.toLocaleString('zh-Hant-MO', {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+            } else {
+                // 若無 last-modified，則使用當前時間（或保留原訊息）
+                document.getElementById('update-time').textContent = new Date().toLocaleString('zh-Hant-MO');
+            }
+
             return response.arrayBuffer();
         })
         .then(data => {
@@ -37,9 +56,6 @@ function loadExcelData() {
             renderMatches('初級組');
             renderResults('初級組');
             renderRankings('初級組');
-            // 手動設定最後更新時間（可依需求修改）
-            const LAST_COMMIT_TIME = new Date('2026-03-17 11:27:40');
-            document.getElementById('update-time').textContent = LAST_COMMIT_TIME.toLocaleString('zh-Hant-MO');
         })
         .catch(error => {
             const errorHtml = `
@@ -59,9 +75,8 @@ function loadExcelData() {
         });
 }
 
-// ========== 事件綁定 ==========
+// ========== 事件綁定（完全與先前相同） ==========
 function bindAllEvents() {
-    // 對賽安排 tabs
     document.querySelectorAll('#matches .tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const group = this.dataset.group;
@@ -70,7 +85,6 @@ function bindAllEvents() {
         });
     });
 
-    // 對賽成績 tabs
     document.querySelectorAll('#results .tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const group = this.dataset.group;
@@ -79,7 +93,6 @@ function bindAllEvents() {
         });
     });
 
-    // 積分榜 tabs
     document.querySelectorAll('#rankings .tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const group = this.dataset.group;
@@ -88,7 +101,6 @@ function bindAllEvents() {
         });
     });
 
-    // 導航錨點平滑滾動
     document.querySelectorAll('nav a').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
@@ -104,7 +116,7 @@ function switchTab(btn, sectionId) {
     btn.classList.add('active');
 }
 
-// ========== 渲染對賽安排 ==========
+// ========== 渲染對賽安排（與先前相同） ==========
 function renderMatches(group) {
     const contentEl = document.getElementById('matches-content');
     const sheetName = `${group}_對賽安排`;
@@ -147,7 +159,7 @@ function renderMatches(group) {
     contentEl.innerHTML = html;
 }
 
-// ========== 渲染對賽成績（所有場次） ==========
+// ========== 渲染對賽成績（與先前相同） ==========
 function renderResults(group) {
     const contentEl = document.getElementById('results-content');
     const sheetName = `${group}_對賽安排`;
@@ -158,7 +170,6 @@ function renderResults(group) {
         return;
     }
 
-    // 按組別分類
     const grouped = {};
     matchesData.forEach(item => {
         const subgroup = item['組別'] || '未分組';
@@ -199,7 +210,7 @@ function renderResults(group) {
     contentEl.innerHTML = html;
 }
 
-// ========== 渲染積分榜（跳過「補賽 組」） ==========
+// ========== 渲染積分榜（與先前相同） ==========
 function renderRankings(group) {
     const contentEl = document.getElementById('rankings-content');
     const sheetName = `${group}_對賽安排`;
@@ -210,7 +221,6 @@ function renderRankings(group) {
         return;
     }
 
-    // 初始化隊伍統計
     const groupStats = {};
     matchesData.forEach(item => {
         const teamA = item['隊伍A'] || '-';
@@ -221,7 +231,6 @@ function renderRankings(group) {
         if (!groupStats[subgroup][teamB]) groupStats[subgroup][teamB] = { win:0, draw:0, lose:0, goal:0, concede:0, score:0 };
     });
 
-    // 計算積分
     matchesData.forEach(item => {
         const teamA = item['隊伍A'] || '-';
         const teamB = item['隊伍B'] || '-';
@@ -253,7 +262,7 @@ function renderRankings(group) {
 
     let html = '';
     Object.keys(groupStats).forEach(subgroup => {
-        if (subgroup === '補賽 組') return; // 跳過補賽組
+        if (subgroup === '補賽 組') return;
 
         const sortedTeams = Object.keys(groupStats[subgroup]).sort((a, b) => {
             const ta = groupStats[subgroup][a], tb = groupStats[subgroup][b];
