@@ -99,19 +99,40 @@
         </div>
     </div>
 
-    <!-- 官方資料 Modal（請將下方連結替換為您自己的 GitHub data 目錄） -->
-    <div id="official-modal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <h2>官方資料</h2>
-            <p>官方圖片與文件存放於 GitHub，點擊下方連結查看：</p>
-            <ul>
-                <li><a href="https://github.com/您的使用者名稱/您的倉庫/tree/main/data" target="_blank">前往 GitHub 資料目錄</a></li>
-                <!-- 若想直接顯示圖片，可使用 <img src="https://raw.githubusercontent.com/您的使用者名稱/您的倉庫/main/data/example.png"> -->
-            </ul>
-            <p>（請自行替換上方連結為實際路徑）</p>
-            <button onclick="closeModal('official-modal')">關閉</button>
-        </div>
+<!-- 官方資料 Modal（請將下方 raw.githubusercontent.com 連結中的 username/repo 改為您的實際路徑） -->
+<div id="official-modal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
+        <h2>官方資料</h2>
+        <p>點擊圖片可查看原始大圖或下載：</p>
+        <ul style="list-style:none; padding:0;">
+            <li style="margin-bottom:20px;">
+                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組.jpeg" target="_blank">
+                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
+                </a>
+                <p style="text-align:center;">澳門工人飛雪杯2026 初級組</p>
+            </li>
+            <li style="margin-bottom:20px;">
+                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組對賽時間表.jpeg" target="_blank">
+                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組對賽時間表.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
+                </a>
+                <p style="text-align:center;">澳門工人飛雪杯2026 初級組對賽時間表</p>
+            </li>
+            <li style="margin-bottom:20px;">
+                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/章程.jpeg" target="_blank">
+                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/章程.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
+                </a>
+                <p style="text-align:center;">章程</p>
+            </li>
+        </ul>
+        <p style="margin-top:20px;">※ 若圖片無法顯示，請確認：</p>
+        <ul style="margin-top:5px;">
+            <li>GitHub 倉庫是否為<strong>公開</strong>（public）</li>
+            <li>路徑中的 <code>vizaiweb/macau-snowcup-2026</code> 是否正確</li>
+            <li>圖片檔案是否確實存在於 <code>data</code> 資料夾且檔名完全一致（包含空格）</li>
+        </ul>
+        <button onclick="closeModal('official-modal')" style="display:block; margin:20px auto 0;">關閉</button>
     </div>
+</div>
 
     <script>
         function showModal(id) { document.getElementById(id).style.display = "block"; }
