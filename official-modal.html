@@ -1,6 +1,6 @@
-<!-- 官方資料 Modal（改為 header-body-footer 結構，按鈕固定在底部） -->
+<!-- 官方資料 Modal（修正：絕對定位 + 固定底部按鈕） -->
 <div id="official-modal" class="modal" style="display:none;">
-    <div class="modal-content" style="display:flex; flex-direction:column; max-height:80vh;">
+    <div class="modal-content" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); margin:0; width:90%; max-width:1000px; max-height:90vh; display:flex; flex-direction:column; background:white; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
         <!-- 標題區域 -->
         <div class="modal-header" style="padding:15px 20px; background:#f0f0f0; border-bottom:1px solid #ccc; border-radius:8px 8px 0 0;">
             <h2 style="margin:0;">官方資料</h2>
@@ -36,7 +36,7 @@
             </ul>
         </div>
         <!-- 固定底部按鈕 -->
-        <div class="modal-footer" style="padding:15px; border-top:1px solid #eee; text-align:center;">
+        <div class="modal-footer" style="padding:15px; border-top:1px solid #eee; text-align:center; flex-shrink:0;">
             <button onclick="closeModal('official-modal')">關閉</button>
         </div>
     </div>
