@@ -247,42 +247,59 @@ footer a:hover {
     }
 }
 
-/* 手機豎屏：僅微調對賽安排表格，其他表格完全不變 */
+/* 手機豎屏：完全恢復你原本想要的效果 */
 @media (max-width: 480px) and (orientation: portrait) {
-    /* 對賽安排：隊伍名稱寬度對齊對賽成績，不換行 + 橫向滾動 */
+    header h1 {
+        font-size: 1.8rem;
+    }
+    nav ul {
+        gap: 15px;
+    }
+    nav a {
+        font-size: 1rem;
+    }
+    .section {
+        padding: 15px;
+    }
+    th, td {
+        padding: 5px 3px !important;
+        font-size: 12px !important;
+    }
+    th {
+        font-size: 11px !important;
+    }
+
+    /* 對賽安排：隊伍寬度對齊對賽成績 + 橫向滾動 */
     #matches-content {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
         padding: 5px 0 !important;
     }
-
     #matches-content table {
         table-layout: fixed !important;
         min-width: 600px !important;
     }
-
     #matches-content table th:nth-child(3),
     #matches-content table td:nth-child(3),
     #matches-content table th:nth-child(4),
     #matches-content table td:nth-child(4) {
         white-space: nowrap !important;
-        width: 25% !important; /* 和對賽成績隊伍欄保持一致 */
-    }
-
-    /* 對賽成績 & 積分榜：保持原樣，不做任何修改 */
-    #results-content,
-    #rankings-content {
-        overflow-x: hidden !important;
-    }
-    #results-content table th:nth-child(3),
-    #results-content table td:nth-child(3),
-    #results-content table th:nth-child(5),
-    #results-content table td:nth-child(5) {
         width: 25% !important;
     }
-    #rankings-content table th:nth-child(2),
-    #rankings-content table td:nth-child(2) {
-        min-width: 160px !important;
-        width: 30% !important;
+
+    /* 積分榜：恢復橫向滾動條（你原本有的）*/
+    #rankings-content {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 5px 0 !important;
+    }
+    #rankings-content table {
+        min-width: 600px !important;
+        table-layout: fixed !important;
+    }
+
+    /* 對賽成績：保持原狀，不開啟橫向滾動 */
+    #results-content {
+        overflow-x: hidden !important;
     }
 }
