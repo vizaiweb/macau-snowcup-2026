@@ -67,11 +67,12 @@
     <footer>
         <a href="#" onclick="showModal('about-modal');return false;">關於</a> | 
         <a href="#" onclick="showModal('privacy-modal');return false;">隱私政策</a> | 
-        <a href="#" onclick="showModal('disclaimer-modal');return false;">免責聲明</a>
+        <a href="#" onclick="showModal('disclaimer-modal');return false;">免責聲明</a> |
+        <a href="#" onclick="showModal('official-modal');return false;">官方資料</a>
         <p>澳門工人飛雪杯2026 - 數據最後更新時間: <span id="update-time">未加載</span></p>
     </footer>
 
-    <!-- Modals -->
+    <!-- 關於 Modal -->
     <div id="about-modal" class="modal" style="display:none;">
         <div class="modal-content">
             <h2>關於</h2>
@@ -79,6 +80,8 @@
             <button onclick="closeModal('about-modal')">關閉</button>
         </div>
     </div>
+
+    <!-- 隱私政策 Modal -->
     <div id="privacy-modal" class="modal" style="display:none;">
         <div class="modal-content">
             <h2>隱私政策</h2>
@@ -86,11 +89,27 @@
             <button onclick="closeModal('privacy-modal')">關閉</button>
         </div>
     </div>
+
+    <!-- 免責聲明 Modal -->
     <div id="disclaimer-modal" class="modal" style="display:none;">
         <div class="modal-content">
             <h2>免責聲明</h2>
             <p>本網站資訊僅供參考，所有最終賽果與資料請以官方公佈為準。<br>網頁內容如有錯漏或時間延遲，恕不負任何法律責任。</p>
             <button onclick="closeModal('disclaimer-modal')">關閉</button>
+        </div>
+    </div>
+
+    <!-- 官方資料 Modal（請將下方連結替換為您自己的 GitHub data 目錄） -->
+    <div id="official-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>官方資料</h2>
+            <p>官方圖片與文件存放於 GitHub，點擊下方連結查看：</p>
+            <ul>
+                <li><a href="https://github.com/您的使用者名稱/您的倉庫/tree/main/data" target="_blank">前往 GitHub 資料目錄</a></li>
+                <!-- 若想直接顯示圖片，可使用 <img src="https://raw.githubusercontent.com/您的使用者名稱/您的倉庫/main/data/example.png"> -->
+            </ul>
+            <p>（請自行替換上方連結為實際路徑）</p>
+            <button onclick="closeModal('official-modal')">關閉</button>
         </div>
     </div>
 
