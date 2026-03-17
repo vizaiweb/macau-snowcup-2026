@@ -50,3 +50,25 @@
     text-align: center;
     flex-shrink: 0;
 }
+
+/* 強制顯示頁腳連結 */
+footer a {
+    color: #3498db !important;          /* 明顯的藍色 */
+    font-size: 16px !important;
+    text-decoration: underline !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: inline-block !important;
+    pointer-events: auto !important;    /* 確保可點擊 */
+}
+
+/* 確保頁腳本身可見 */
+footer {
+    color: #888 !important;
+    background: #f8f8f8 !important;
+    padding: 16px 0 !important;
+    border-top: 1px solid #e0e0e0 !important;
+    text-align: center !important;
+    display: block !important;
+    visibility: visible !important;
+}
