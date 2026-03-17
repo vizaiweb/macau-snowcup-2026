@@ -19,24 +19,42 @@ function excelTimeToHHMM(excelTime) {
 
 // ========== 數據加載 ==========
 function loadExcelData() {
-    fetch(DATA_FILE_PATH + '?t=' + new Date().getTime())
-        .then(response => {
-            if (!response.ok) throw new Error(`文件加載失敗（狀態碼：${response.status}）`);
-            return response.arrayBuffer();
-        })
-        .then(data => {
-            const workbook = XLSX.read(data, { type: 'array' });
-            workbook.SheetNames.forEach(sheetName => {
-                excelData[sheetName] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
-            });
-            renderMatches('初級組');
-            renderResults('初級組');
-            renderRankings('初級組');
-            // 手動設置最後 commit 的時間（你可根據實際提交時間修改）
-            const LAST_COMMIT_TIME = new Date('2026-03-17 11:27:40');
-            document.getElementById('update-time').textContent = LAST_COMMIT_TIME.toLocaleString('zh-Hant-MO');
+    // 1. 先請求獲取Excel文件的最後修改時間（需後端接口返回）
+    fetch('/api/get-excel-modify-time') // 後端接口示例
+        .then(timeRes => timeRes.json())
+        .then(timeData => {
+            const excelModifyTime = new Date(timeData.modifyTime);
+            
+            // 2. 再加載Excel數據
+            return fetch(DATA_FILE_PATH + '?t=' + new Date().getTime())
+                .then(response => {
+                    if (!response.ok) throw new Error(`文件加載失敗（狀態碼：${response.status}）`);
+                    return response.arrayBuffer();
+                })
+                .then(data => {
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    workbook.SheetNames.forEach(sheetName => {
+                        excelData[sheetName] = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName]);
+                    });
+                    renderMatches('初級組');
+                    renderResults('初級組');
+                    renderRankings('初級組');
+                    
+                    // 顯示Excel文件的最後修改時間
+                    const formattedTime = excelModifyTime.toLocaleString('zh-Hant-MO', {
+                        day: 'numeric',
+                        month: 'numeric',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    });
+                    document.getElementById('update-time').textContent = formattedTime;
+                });
         })
         .catch(error => {
+            // 錯誤處理（不變）
             const errorHtml = `
             <div style="padding:20px; color:#e74c3c; text-align:center;">
                 <h4>數據加載失敗！</h4>
