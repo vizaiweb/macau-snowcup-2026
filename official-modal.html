@@ -1,29 +1,43 @@
-<!-- 官方資料 Modal（請將下方 raw.githubusercontent.com 連結中的 username/repo 改為您的實際路徑） -->
+<!-- 官方資料 Modal（改為 header-body-footer 結構，按鈕固定在底部） -->
 <div id="official-modal" class="modal" style="display:none;">
-    <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
-        <h2>官方資料</h2>
-        <p>點擊圖片可查看原始大圖或下載：</p>
-        <ul style="list-style:none; padding:0;">
-            <li style="margin-bottom:20px;">
-                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組.jpeg" target="_blank">
-                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
-                </a>
-                <p>澳門工人飛雪杯2026 初級組</p>
-            </li>
-            <li style="margin-bottom:20px;">
-                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組對賽時間表.jpeg" target="_blank">
-                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組對賽時間表.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
-                </a>
-                <p>澳門工人飛雪杯2026 初級組對賽時間表</p>
-            </li>
-            <li style="margin-bottom:20px;">
-                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/章程.jpeg" target="_blank">
-                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/章程.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
-                </a>
-                <p>章程</p>
-            </li>
-        </ul>
-        <p style="margin-top:20px;">※ 若圖片無法顯示，請確認 GitHub 倉庫是否公開，且路徑正確。</p>
-        <button onclick="closeModal('official-modal')">關閉</button>
+    <div class="modal-content" style="display:flex; flex-direction:column; max-height:80vh;">
+        <!-- 標題區域 -->
+        <div class="modal-header" style="padding:15px 20px; background:#f0f0f0; border-bottom:1px solid #ccc; border-radius:8px 8px 0 0;">
+            <h2 style="margin:0;">官方資料</h2>
+        </div>
+        <!-- 可滾動的內容區域 -->
+        <div class="modal-body" style="padding:20px; overflow-y:auto; flex:1;">
+            <p>點擊圖片可查看原始大圖或下載：</p>
+            <ul style="list-style:none; padding:0;">
+                <li style="margin-bottom:20px;">
+                    <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組.jpeg" target="_blank">
+                        <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
+                    </a>
+                    <p style="text-align:center;">澳門工人飛雪杯2026 初級組</p>
+                </li>
+                <li style="margin-bottom:20px;">
+                    <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組對賽時間表.jpeg" target="_blank">
+                        <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組對賽時間表.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
+                    </a>
+                    <p style="text-align:center;">澳門工人飛雪杯2026 初級組對賽時間表</p>
+                </li>
+                <li style="margin-bottom:20px;">
+                    <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/章程.jpeg" target="_blank">
+                        <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/章程.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
+                    </a>
+                    <p style="text-align:center;">章程</p>
+                </li>
+            </ul>
+            <p style="margin-top:20px;">※ 若圖片無法顯示，請確認：</p>
+            <ul style="margin-top:5px;">
+                <li>GitHub 倉庫是否為<strong>公開</strong>（public）</li>
+                <li>路徑中的 <code>vizaiweb/macau-snowcup-2026</code> 是否正確</li>
+                <li>圖片檔案確實存在於 <code>data</code> 資料夾且檔名完全一致</li>
+            </ul>
+        </div>
+        <!-- 固定底部按鈕 -->
+        <div class="modal-footer" style="padding:15px; border-top:1px solid #eee; text-align:center;">
+            <button onclick="closeModal('official-modal')">關閉</button>
+        </div>
     </div>
 </div>
