@@ -152,12 +152,11 @@ tr:hover {
     white-space: nowrap !important;
 }
 
-/* 積分榜列寬：隊伍名稱優先（默認） */
+/* 積分榜列寬：默認自適應 */
 #rankings-content table th:nth-child(2),
 #rankings-content table td:nth-child(2) {
-    min-width: 160px !important;
-    width: 30% !important;
     white-space: nowrap !important;
+    max-width: 200px !important; /* 上限，避免過寬 */
 }
 
 /* 頁腳樣式 */
@@ -247,7 +246,7 @@ footer a:hover {
     }
 }
 
-/* 手機豎屏：最終調整（僅改積分榜寬度） */
+/* 手機豎屏：完全自適應，無固定寬度 */
 @media (max-width: 480px) and (orientation: portrait) {
     header h1 {
         font-size: 1.8rem;
@@ -269,59 +268,54 @@ footer a:hover {
         font-size: 11px !important;
     }
 
-    /* 對賽安排：隊伍寬度對齊對賽成績 + 橫向滾動（不變） */
+    /* 對賽安排：隊伍寬度對齊對賽成績 + 橫向滾動 */
     #matches-content {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
         padding: 5px 0 !important;
     }
     #matches-content table {
-        table-layout: fixed !important;
-        min-width: 600px !important;
+        table-layout: auto !important; /* 自適應內容 */
+        min-width: auto !important; /* 取消固定最小寬度 */
     }
     #matches-content table th:nth-child(3),
     #matches-content table td:nth-child(3),
     #matches-content table th:nth-child(4),
     #matches-content table td:nth-child(4) {
         white-space: nowrap !important;
-        width: 25% !important;
+        max-width: 180px !important; /* 上限，避免過寬 */
     }
 
-    /* 積分榜：橫向滾動 + 寬度縮減（核心修改） */
+    /* 積分榜：核心自適應邏輯（重點） */
     #rankings-content {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
         padding: 5px 0 !important;
     }
     #rankings-content table {
-        min-width: 600px !important;
-        table-layout: fixed !important;
+        table-layout: auto !important; /* 讓表格根據內容自適應所有手機屏幕 */
+        min-width: auto !important; /* 取消固定最小寬度，隨屏幕變 */
+        width: 100% !important;
     }
-    /* 積分榜隊伍名稱：原30% → 減20% = 24% */
+    /* 積分榜隊伍名稱：自適應 + 上限 + 不換行 + 溢出省略（極端情況） */
     #rankings-content table th:nth-child(2),
     #rankings-content table td:nth-child(2) {
-        width: 24% !important;
-        min-width: 128px !important; /* 原160px減20% = 128px */
+        white-space: nowrap !important;
+        max-width: calc(100vw - 300px) !important; /* 動態計算：屏幕寬度 - 其他列總寬 */
+        overflow: hidden !important;
+        text-overflow: ellipsis !important; /* 極端長名稱顯示...，不越界 */
+        text-align: left !important; /* 左對齊，盡量顯示更多文字 */
+        padding-left: 8px !important;
     }
-    /* 積分榜其他列：原寬度減30%（排名/勝/平/負/進球/失球/積分） */
-    #rankings-content table th:nth-child(1),
-    #rankings-content table td:nth-child(1),
-    #rankings-content table th:nth-child(3),
-    #rankings-content table td:nth-child(3),
-    #rankings-content table th:nth-child(4),
-    #rankings-content table td:nth-child(4),
-    #rankings-content table th:nth-child(5),
-    #rankings-content table td:nth-child(5),
-    #rankings-content table th:nth-child(6),
-    #rankings-content table td:nth-child(6),
-    #rankings-content table th:nth-child(7),
-    #rankings-content table td:nth-child(7),
-    #rankings-content table th:nth-child(8),
-    #rankings-content table td:nth-child(8) {
-        width: calc((100% - 24%)/7 * 0.7) !important;
+    /* 積分榜其他列：自適應內容寬度，不擠壓 */
+    #rankings-content table th:not(:nth-child(2)),
+    #rankings-content table td:not(:nth-child(2)) {
+        white-space: nowrap !important;
+        max-width: 60px !important; /* 上限，避免過寬 */
+        width: auto !important; /* 隨內容自適應 */
     }
 
-    /* 對賽成績：完全不動（不變） */
+    /* 對賽成績：保持不動 */
     #results-content {
         overflow-x: hidden !important;
     }
