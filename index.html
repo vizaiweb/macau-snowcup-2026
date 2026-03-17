@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>澳門工人飛雪杯2026</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- 引入Excel解析库（使用CDN避免本地文件依赖） -->
+    <!-- 引入Excel解析庫 -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <body>
@@ -21,7 +21,7 @@
     </header>
 
     <main>
-        <!-- 對賽安排區塊 -->
+        <!-- 對賽安排 -->
         <section id="matches" class="section">
             <h2>對賽安排</h2>
             <div class="tabs">
@@ -31,12 +31,11 @@
                 <button class="tab-btn" data-group="元老組">元老組</button>
             </div>
             <div class="tab-content" id="matches-content">
-                <!-- 由JS動態加載數據 -->
                 <div class="loading">加載中...</div>
             </div>
         </section>
 
-        <!-- 對賽成績區塊 -->
+        <!-- 對賽成績 -->
         <section id="results" class="section">
             <h2>對賽成績</h2>
             <div class="tabs">
@@ -46,12 +45,11 @@
                 <button class="tab-btn" data-group="元老組">元老組</button>
             </div>
             <div class="tab-content" id="results-content">
-                <!-- 由JS動態加載數據 -->
                 <div class="loading">加載中...</div>
             </div>
         </section>
 
-        <!-- 積分榜區塊 -->
+        <!-- 積分榜 -->
         <section id="rankings" class="section">
             <h2>積分榜</h2>
             <div class="tabs">
@@ -61,7 +59,6 @@
                 <button class="tab-btn" data-group="元老組">元老組</button>
             </div>
             <div class="tab-content" id="rankings-content">
-                <!-- 由JS動態加載數據 -->
                 <div class="loading">加載中...</div>
             </div>
         </section>
@@ -74,45 +71,33 @@
         <p>澳門工人飛雪杯2026 - 數據最後更新時間: <span id="update-time">未加載</span></p>
     </footer>
 
-    <!-- Modal HTML -->
-<div id="about-modal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <h2>關於</h2>
-    <p>本網站為《澳門雪杯足球賽2026》非官方資訊平台...</p>
-    <button onclick="closeModal('about-modal')">關閉</button>
-  </div>
-</div>
+    <!-- Modals -->
+    <div id="about-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>關於</h2>
+            <p>本網站為《澳門雪杯足球賽2026》非官方資訊平台...</p>
+            <button onclick="closeModal('about-modal')">關閉</button>
+        </div>
+    </div>
+    <div id="privacy-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>隱私政策</h2>
+            <p>我們尊重您的隱私，不會收集或分享任何個人資訊。本網站僅展示公開足球賽事資料，不設用戶註冊、評論、跟蹤等功能。如有第三方連結，請參閱其各自的隱私政策。</p>
+            <button onclick="closeModal('privacy-modal')">關閉</button>
+        </div>
+    </div>
+    <div id="disclaimer-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>免責聲明</h2>
+            <p>本網站資訊僅供參考，所有最終賽果與資料請以官方公佈為準。<br>網頁內容如有錯漏或時間延遲，恕不負任何法律責任。</p>
+            <button onclick="closeModal('disclaimer-modal')">關閉</button>
+        </div>
+    </div>
 
-    <!-- Privacy Policy Modal -->
-<div id="privacy-modal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <h2>隱私政策</h2>
-    <p>我們尊重您的隱私，不會收集或分享任何個人資訊。本網站僅展示公開足球賽事資料，不設用戶註冊、評論、跟蹤等功能。如有第三方連結，請參閱其各自的隱私政策。</p>
-    <button onclick="closeModal('privacy-modal')">關閉</button>
-  </div>
-</div>
-
-<!-- Disclaimer Modal -->
-<div id="disclaimer-modal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <h2>免責聲明</h2>
-    <p>本網站資訊僅供參考，所有最終賽果與資料請以官方公佈為準。<br>
-      網頁內容如有錯漏或時間延遲，恕不負任何法律責任。</p>
-    <button onclick="closeModal('disclaimer-modal')">關閉</button>
-  </div>
-</div>
-
-    
-
-<script>
-function showModal(id) {
-  document.getElementById(id).style.display = "block";
-}
-function closeModal(id) {
-  document.getElementById(id).style.display = "none";
-}
-</script>
-
+    <script>
+        function showModal(id) { document.getElementById(id).style.display = "block"; }
+        function closeModal(id) { document.getElementById(id).style.display = "none"; }
+    </script>
     <script src="js/script.js"></script>
 </body>
 </html>
