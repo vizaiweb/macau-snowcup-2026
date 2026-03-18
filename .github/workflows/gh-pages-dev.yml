@@ -1,0 +1,15 @@
+name: Deploy dev branch to Pages
+on:
+  push:
+    branches: [ dev ]  # 只监听dev分支的推送
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages-dev  # 专门存放dev分支的部署文件
+          publish_dir: ./  # 项目根目录（如果是Vue/React，改成./dist）
