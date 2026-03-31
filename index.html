@@ -83,12 +83,11 @@
     <div id="about-modal" class="modal" style="display:none;">
         <div class="modal-content">
             <h2>關於</h2>
-             <p>
-      本網站為《澳門雪杯足球賽2026》非官方資訊平台，旨在提供比賽賽程、成績、積分等公開資料。<br>
-      所有資訊源於主辦方及相關渠道，歡迎查閱、交流及分享。
-    </p>
-    <!-- 新增聯絡方式 -->
-    <p>聯絡方式：<a href="mailto:vizaiweb@gmail.com">vizaiweb@gmail.com</a></p>
+            <p>
+                本網站為《澳門雪杯足球賽2026》非官方資訊平台，旨在提供比賽賽程、成績、積分等公開資料。<br>
+                所有資訊源於主辦方及相關渠道，歡迎查閱、交流及分享。
+            </p>
+            <p>聯絡方式：<a href="mailto:vizaiweb@gmail.com">vizaiweb@gmail.com</a></p>
             <button onclick="closeModal('about-modal')">關閉</button>
         </div>
     </div>
@@ -111,34 +110,52 @@
         </div>
     </div>
 
-<!-- 官方資料 Modal（請將下方 raw.githubusercontent.com 連結中的 username/repo 改為您的實際路徑） -->
-<div id="official-modal" class="modal" style="display:none;">
-    <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
-        <h2>官方資料</h2>
-        <p>點擊圖片可查看原始大圖或下載：</p>
-        <ul style="list-style:none; padding:0;">
-            <li style="margin-bottom:20px;">
-                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組.jpeg" target="_blank">
-                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
-                </a>
-                <p style="text-align:center;">澳門工人飛雪杯2026 初級組</p>
-            </li>
-            <li style="margin-bottom:20px;">
-                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組對賽時間表.jpeg" target="_blank">
-                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組對賽時間表.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
-                </a>
-                <p style="text-align:center;">澳門工人飛雪杯2026 初級組對賽時間表</p>
-            </li>
-            <li style="margin-bottom:20px;">
-                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/章程.jpeg" target="_blank">
-                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/章程.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
-                </a>
-                <p style="text-align:center;">章程</p>
-            </li>
-        
-        <button onclick="closeModal('official-modal')" style="display:block; margin:20px auto 0;">關閉</button>
+    <!-- 官方資料 Modal（包含所有官方圖片） -->
+    <div id="official-modal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
+            <h2>官方資料</h2>
+            <p>點擊圖片可查看原始大圖或下載：</p>
+            <ul style="list-style:none; padding:0;">
+                <!-- 初級組分組名單 -->
+                <li style="margin-bottom:20px;">
+                    <a href="data/澳門工人飛雪杯2026 初級組.jpeg" target="_blank">
+                        <img src="data/澳門工人飛雪杯2026 初級組.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;" alt="澳門工人飛雪杯2026 初級組">
+                    </a>
+                    <p style="text-align:center;">澳門工人飛雪杯2026 初級組</p>
+                </li>
+                <!-- 初級組對賽時間表 -->
+                <li style="margin-bottom:20px;">
+                    <a href="data/澳門工人飛雪杯2026 初級組對賽時間表.jpeg" target="_blank">
+                        <img src="data/澳門工人飛雪杯2026 初級組對賽時間表.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;" alt="澳門工人飛雪杯2026 初級組對賽時間表">
+                    </a>
+                    <p style="text-align:center;">澳門工人飛雪杯2026 初級組對賽時間表</p>
+                </li>
+                <!-- 高級組、中年組、元老組分組名單（新增） -->
+                <li style="margin-bottom:20px;">
+                    <a href="data/澳門工人飛雪杯2026 高級組 中年組 元老組.jpeg" target="_blank">
+                        <img src="data/澳門工人飛雪杯2026 高級組 中年組 元老組.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;" alt="澳門工人飛雪杯2026 高級組 中年組 元老組">
+                    </a>
+                    <p style="text-align:center;">澳門工人飛雪杯2026 高級組、中年組、元老組</p>
+                </li>
+                <!-- 高級組、中年組、元老組對賽時間表（新增） -->
+                <li style="margin-bottom:20px;">
+                    <a href="data/澳門工人飛雪杯2026 高級組 中年組 元老組對賽時間表.jpeg" target="_blank">
+                        <img src="data/澳門工人飛雪杯2026 高級組 中年組 元老組對賽時間表.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;" alt="澳門工人飛雪杯2026 高級組 中年組 元老組對賽時間表">
+                    </a>
+                    <p style="text-align:center;">澳門工人飛雪杯2026 高級組、中年組、元老組對賽時間表</p>
+                </li>
+                <!-- 章程 -->
+                <li style="margin-bottom:20px;">
+                    <a href="data/章程.jpeg" target="_blank">
+                        <img src="data/章程.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;" alt="章程">
+                    </a>
+                    <p style="text-align:center;">章程</p>
+                </li>
+            </ul>
+            <p style="margin-top:20px;">※ 若圖片無法顯示，請確認 GitHub 倉庫是否公開，且路徑正確。</p>
+            <button onclick="closeModal('official-modal')">關閉</button>
+        </div>
     </div>
-</div>
 
     <script>
         function showModal(id) { document.getElementById(id).style.display = "block"; }
