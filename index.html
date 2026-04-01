@@ -1,165 +1,656 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 优化标题：包含核心关键词，符合用户搜索习惯 -->
-    <title>澳門工人飛雪杯2026 | 賽事安排、對賽成績、積分榜</title>
-    <!-- 优化描述：告诉Google和用户页面核心内容，提升点击量 -->
-    <meta name="description" content="2026澳門工人飛雪杯官方賽事資訊平台，實時更新初級組、高級組、中年組、元老組對賽安排、對賽成績及球隊積分榜。">
-    <!-- 关键词标签（辅助Google识别核心内容） -->
-    <meta name="keywords" content="澳門工人飛雪杯2026,澳門飛雪杯,對賽安排,對賽成績,積分榜">
-    <!-- 声明页面语言（帮助Google精准匹配地区用户） -->
-    <meta http-equiv="Content-Language" content="zh-Hant">
-    <!-- 引入Excel解析庫 -->
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>澳門工人飛雪杯2026 - 足球賽事系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang TC', 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3b 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 標題區 */
+        .header {
+            background: linear-gradient(135deg, #ffd966, #ffb347);
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        .header h1 {
+            font-size: 2rem;
+            color: #2c3e2f;
+            margin-bottom: 8px;
+        }
+        .header p {
+            color: #5a3e1a;
+            font-size: 1rem;
+        }
+        
+        /* 數據更新時間提示 */
+        .update-time {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #5a3e1a;
+            margin-top: 8px;
+            background: rgba(255,255,200,0.5);
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        /* 頁籤切換 */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+        .tab-btn {
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f5e6d3;
+            color: #5a3e1a;
+        }
+        .tab-btn.active {
+            background: #ffb347;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transform: scale(1.02);
+        }
+        .tab-btn:hover:not(.active) {
+            background: #ffe0b5;
+            transform: translateY(-2px);
+        }
+        
+        /* 刷新按鈕 */
+        .refresh-btn {
+            background: #ffb347;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 20px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 15px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .refresh-btn:hover {
+            background: #ff9f1a;
+            transform: scale(1.02);
+        }
+        .refresh-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* 加載狀態 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        /* 錯誤提示 */
+        .error-message {
+            text-align: center;
+            padding: 60px 20px;
+            background: #fff5f5;
+            border-radius: 16px;
+            color: #d32f2f;
+            font-size: 1.1rem;
+            border: 1px solid #ffcdd2;
+        }
+
+        /* 內容區域 */
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 組別標題 */
+        .group-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff8c42;
+            border-left: 5px solid #ffb347;
+            padding-left: 15px;
+            margin: 20px 0 15px 0;
+        }
+        .group-title:first-of-type {
+            margin-top: 0;
+        }
+
+        /* 表格樣式 */
+        .standing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .standing-table th {
+            background: #2d5a3b;
+            color: white;
+            padding: 12px 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .standing-table td {
+            padding: 10px 6px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+        .standing-table tr:hover {
+            background: #fef7e0;
+        }
+        
+        .team-name {
+            text-align: left;
+            font-weight: 500;
+            padding-left: 12px;
+        }
+        
+        /* 官方資料按鈕 */
+        .official-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ffb347;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .official-btn:hover {
+            background: #ff9f1a;
+            transform: scale(1.05);
+        }
+        
+        /* Modal 樣式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.2s ease;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .modal-content h2 {
+            color: #ff8c42;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ffd966;
+            padding-bottom: 8px;
+        }
+        .modal-content ul {
+            list-style: none;
+            padding: 0;
+        }
+        .modal-content li {
+            margin-bottom: 20px;
+        }
+        .modal-content img {
+            max-width: 100%;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .modal-content img:hover {
+            transform: scale(1.02);
+        }
+        .modal-content button {
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 30px;
+            background: #ffb347;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .standing-table th, .standing-table td {
+                padding: 8px 4px;
+                font-size: 0.7rem;
+            }
+            .group-title {
+                font-size: 1.2rem;
+            }
+            .tab-btn {
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+            .official-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+            .refresh-btn {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.8rem;
+        }
+        
+        /* 數據來源提示 */
+        .data-source {
+            font-size: 0.7rem;
+            color: #888;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>澳門工人飛雪杯2026</h1>
-        <nav>
-            <ul>
-                <li><a href="#matches" class="nav-active">對賽安排</a></li>
-                <li><a href="#results">對賽成績</a></li>
-                <li><a href="#rankings">積分榜</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <main>
-        <!-- 對賽安排 -->
-        <section id="matches" class="section">
-            <h2>對賽安排</h2>
-            <div class="tabs">
-                <button class="tab-btn active" data-group="初級組">初級組 (76隊)</button>
-                <button class="tab-btn" data-group="高級組">高級組</button>
-                <button class="tab-btn" data-group="中年組">中年組</button>
-                <button class="tab-btn" data-group="元老組">元老組</button>
-            </div>
-            <div class="tab-content" id="matches-content">
-                <div class="loading">加載中...</div>
-            </div>
-        </section>
-
-        <!-- 對賽成績 -->
-        <section id="results" class="section">
-            <h2>對賽成績</h2>
-            <div class="tabs">
-                <button class="tab-btn active" data-group="初級組">初級組 (76隊)</button>
-                <button class="tab-btn" data-group="高級組">高級組</button>
-                <button class="tab-btn" data-group="中年組">中年組</button>
-                <button class="tab-btn" data-group="元老組">元老組</button>
-            </div>
-            <div class="tab-content" id="results-content">
-                <div class="loading">加載中...</div>
-            </div>
-        </section>
-
-        <!-- 積分榜 -->
-        <section id="rankings" class="section">
-            <h2>積分榜</h2>
-            <div class="tabs">
-                <button class="tab-btn active" data-group="初級組">初級組 (76隊)</button>
-                <button class="tab-btn" data-group="高級組">高級組</button>
-                <button class="tab-btn" data-group="中年組">中年組</button>
-                <button class="tab-btn" data-group="元老組">元老組</button>
-            </div>
-            <div class="tab-content" id="rankings-content">
-                <div class="loading">加載中...</div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <a href="#" onclick="showModal('about-modal');return false;">關於</a> | 
-        <a href="#" onclick="showModal('privacy-modal');return false;">隱私政策</a> | 
-        <a href="#" onclick="showModal('disclaimer-modal');return false;">免責聲明</a> |
-        <a href="#" onclick="showModal('official-modal');return false;">官方資料</a>
-        <p>澳門工人飛雪杯2026 - 數據最後更新時間: <span id="update-time">未加載</span></p>
-    </footer>
-
-    <!-- 關於 Modal -->
-    <div id="about-modal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <h2>關於</h2>
-            <p>
-                本網站為《澳門雪杯足球賽2026》非官方資訊平台，旨在提供比賽賽程、成績、積分等公開資料。<br>
-                所有資訊源於主辦方及相關渠道，歡迎查閱、交流及分享。
-            </p>
-            <p>聯絡方式：<a href="mailto:vizaiweb@gmail.com">vizaiweb@gmail.com</a></p>
-            <button onclick="closeModal('about-modal')">關閉</button>
+<div class="container">
+    <div class="header">
+        <h1>⚽ 澳門工人飛雪杯2026 ⚽</h1>
+        <p>積分榜 | 即時更新賽果數據</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-top: 10px;">
+            <span class="update-time" id="updateTimeDisplay">📅 等待載入數據...</span>
+            <button class="refresh-btn" id="refreshDataBtn" onclick="loadAllData()">🔄 刷新數據</button>
         </div>
     </div>
-
-    <!-- 隱私政策 Modal -->
-    <div id="privacy-modal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <h2>隱私政策</h2>
-            <p>我們尊重您的隱私，不會收集或分享任何個人資訊。本網站僅展示公開足球賽事資料，不設用戶註冊、評論、跟蹤等功能。如有第三方連結，請參閱其各自的隱私政策。</p>
-            <button onclick="closeModal('privacy-modal')">關閉</button>
-        </div>
+    
+    <!-- 頁籤按鈕 -->
+    <div class="tabs" id="tabsContainer">
+        <button class="tab-btn active" data-tab="junior">🏆 初級組</button>
+        <button class="tab-btn" data-tab="senior">🏅 高級組</button>
+        <button class="tab-btn" data-tab="middle">🎯 中年組</button>
+        <button class="tab-btn" data-tab="veteran">⭐ 元老組</button>
     </div>
-
-    <!-- 免責聲明 Modal -->
-    <div id="disclaimer-modal" class="modal" style="display:none;">
-        <div class="modal-content">
-            <h2>免責聲明</h2>
-            <p>本網站資訊僅供參考，所有最終賽果與資料請以官方公佈為準。<br>網頁內容如有錯漏或時間延遲，恕不負任何法律責任。</p>
-            <button onclick="closeModal('disclaimer-modal')">關閉</button>
-        </div>
+    
+    <!-- 初級組內容 -->
+    <div id="junior" class="tab-content active">
+        <div class="group-title">📌 初級組 A組</div>
+        <table class="standing-table" id="junior-a-table">
+            <thead>
+                <tr><th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>               </thead>
+            <tbody>                 <td colspan="10" class="loading">載入中...                 </tbody>
+           </table>
+        
+        <div class="group-title">📌 初級組 B組</div>
+        <table class="standing-table" id="junior-b-table">
+            <thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead>
+            <tbody>                 <td colspan="10" class="loading">載入中...                 </tbody>
+           </table>
+        
+        <div class="group-title">📌 初級組 C組</div>
+        <table class="standing-table" id="junior-c-table">
+            <thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead>
+            <tbody>                 <td colspan="10" class="loading">載入中...                 </tbody>
+           </table>
     </div>
-
-    <!-- 官方資料 Modal（包含所有官方圖片） -->
-    <div id="official-modal" class="modal" style="display:none;">
-        <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
-            <h2>官方資料</h2>
-            <p>點擊圖片可查看原始大圖或下載：</p>
-            <ul style="list-style:none; padding:0;">
-                <!-- 初級組分組名單 -->
-                <li style="margin-bottom:20px;">
-                    <a href="data/澳門工人飛雪杯2026 初級組.jpeg" target="_blank">
-                        <img src="data/澳門工人飛雪杯2026 初級組.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;" alt="澳門工人飛雪杯2026 初級組">
-                    </a>
-                    <p style="text-align:center;">澳門工人飛雪杯2026 初級組</p>
-                </li>
-                <!-- 初級組對賽時間表 -->
-                <li style="margin-bottom:20px;">
-                    <a href="data/2026(飛雪盃)澳門工人小球聯賽時間表1.jpeg" target="_blank">
-                        <img src="data/2026(飛雪盃)澳門工人小球聯賽時間表1.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;" alt="2026(飛雪盃)澳門工人小球聯賽時間表1">
-                    </a>
-                    <p style="text-align:center;">2026(飛雪盃)澳門工人小球聯賽時間表1</p>
-                </li>
-                <!-- 高級組、中年組、元老組分組名單 -->
-                <li style="margin-bottom:20px;">
-                    <a href="data/澳門工人飛雪杯2026 高級組 中年組 元老組.jpeg" target="_blank">
-                        <img src="data/澳門工人飛雪杯2026 高級組 中年組 元老組.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;" alt="澳門工人飛雪杯2026 高級組 中年組 元老組">
-                    </a>
-                    <p style="text-align:center;">澳門工人飛雪杯2026 高級組、中年組、元老組</p>
-                </li>
-                <!-- 高級組、中年組、元老組對賽時間表 -->
-                <li style="margin-bottom:20px;">
-                    <a href="data/2026(飛雪盃)澳門工人小球聯賽時間表2.jpeg" target="_blank">
-                        <img src="data/2026(飛雪盃)澳門工人小球聯賽時間表2.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;" alt="2026(飛雪盃)澳門工人小球聯賽時間表2">
-                    </a>
-                    <p style="text-align:center;">2026(飛雪盃)澳門工人小球聯賽時間表2</p>
-                </li>
-                <!-- 章程 -->
-                <li style="margin-bottom:20px;">
-                    <a href="data/章程.jpeg" target="_blank">
-                        <img src="data/章程.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;" alt="章程">
-                    </a>
-                    <p style="text-align:center;">章程</p>
-                </li>
-            </ul>
-            <button onclick="closeModal('official-modal')">關閉</button>
-        </div>
+    
+    <!-- 高級組內容 -->
+    <div id="senior" class="tab-content">
+        <div class="group-title">📌 高級組 A組</div>
+        <table class="standing-table" id="senior-a-table"><thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead><tbody>                 <td colspan="10" class="loading">載入中...                 </tbody></table>
+        <div class="group-title">📌 高級組 B組</div>
+        <table class="standing-table" id="senior-b-table"><thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead><tbody>                 <td colspan="10" class="loading">載入中...                 </tbody></table>
+        <div class="group-title">📌 高級組 C組</div>
+        <table class="standing-table" id="senior-c-table"><thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead><tbody>                 <td colspan="10" class="loading">載入中...                 </tbody></table>
     </div>
+    
+    <!-- 中年組內容 -->
+    <div id="middle" class="tab-content">
+        <div class="group-title">📌 中年組 A組</div>
+        <table class="standing-table" id="middle-a-table"><thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead><tbody>                 <td colspan="10" class="loading">載入中...                 </tbody></table>
+        <div class="group-title">📌 中年組 B組</div>
+        <table class="standing-table" id="middle-b-table"><thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead><tbody>                 <td colspan="10" class="loading">載入中...                 </tbody></table>
+    </div>
+    
+    <!-- 元老組內容 -->
+    <div id="veteran" class="tab-content">
+        <div class="group-title">📌 元老組 A組</div>
+        <table class="standing-table" id="veteran-a-table"><thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead><tbody>                 <td colspan="10" class="loading">載入中...                 </tbody></table>
+        <div class="group-title">📌 元老組 B組</div>
+        <table class="standing-table" id="veteran-b-table"><thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead><tbody>                 <td colspan="10" class="loading">載入中...                 </tbody></table>
+    </div>
+    
+    <div class="footer">
+        <p>※ 數據即時更新 | 根據實際賽果自動計算積分排名</p>
+        <p class="data-source" id="dataSourceInfo">📊 正在連接數據庫...</p>
+    </div>
+</div>
 
-    <script>
-        function showModal(id) { document.getElementById(id).style.display = "block"; }
-        function closeModal(id) { document.getElementById(id).style.display = "none"; }
-    </script>
-    <script src="js/script.js"></script>
+<button class="official-btn" onclick="openModal()">📄 官方資料</button>
+
+<!-- 官方資料 Modal -->
+<div id="official-modal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
+        <h2>📋 官方資料</h2>
+        <p>點擊圖片可查看原始大圖或下載：</p>
+        <ul style="list-style:none; padding:0;">
+            <li style="margin-bottom:20px;">
+                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組.jpeg" target="_blank">
+                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
+                </a>
+                <p>澳門工人飛雪杯2026 初級組</p>
+            </li>
+            <li style="margin-bottom:20px;">
+                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組對賽時間表.jpeg" target="_blank">
+                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/澳門工人飛雪杯2026%20初級組對賽時間表.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
+                </a>
+                <p>澳門工人飛雪杯2026 初級組對賽時間表</p>
+            </li>
+            <li style="margin-bottom:20px;">
+                <a href="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/章程.jpeg" target="_blank">
+                    <img src="https://raw.githubusercontent.com/vizaiweb/macau-snowcup-2026/main/data/章程.jpeg" style="max-width:100%; border:1px solid #ddd; border-radius:4px;">
+                </a>
+                <p>章程</p>
+            </li>
+        </ul>
+        <p style="margin-top:20px;">※ 若圖片無法顯示，請確認 GitHub 倉庫是否公開，且路徑正確。</p>
+        <button onclick="closeModal()">關閉</button>
+    </div>
+</div>
+
+<script>
+    // ====================== 動態數據加載 ======================
+    // 數據可通過外部 JSON 檔案更新
+    const DATA_URL = './data/standings.json';
+    
+    // 顯示所有表格的錯誤訊息
+    function showAllTablesError() {
+        const tableIds = [
+            'junior-a-table', 'junior-b-table', 'junior-c-table',
+            'senior-a-table', 'senior-b-table', 'senior-c-table',
+            'middle-a-table', 'middle-b-table',
+            'veteran-a-table', 'veteran-b-table'
+        ];
+        
+        tableIds.forEach(tableId => {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            if (tbody) {
+                tbody.innerHTML = `                     <td colspan="10" style="text-align:center; padding: 40px; color: #d32f2f;">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">⚠️</div>
+                        <div>無法連接數據庫</div>
+                        <div style="font-size: 0.8rem; margin-top: 8px;">請檢查網絡連接或稍後再試</div>
+                       </td>`;
+            }
+        });
+        
+        const sourceInfo = document.getElementById('dataSourceInfo');
+        if (sourceInfo) {
+            sourceInfo.innerHTML = `❌ 數據庫連接失敗 - 無法載入積分榜數據`;
+            sourceInfo.style.color = '#d32f2f';
+        }
+        
+        const timeDisplay = document.getElementById('updateTimeDisplay');
+        if (timeDisplay) {
+            timeDisplay.innerHTML = `⚠️ 無法連接數據庫`;
+            timeDisplay.style.background = '#ffebee';
+            timeDisplay.style.color = '#d32f2f';
+        }
+    }
+    
+    // 計算積分、淨勝球，並排序
+    function calculateAndSort(teams) {
+        const processed = teams.map(t => ({
+            ...t,
+            points: t.win * 3 + t.draw * 1,
+            gd: t.gf - t.ga
+        }));
+        // 排序規則：積分 > 淨勝球 > 得球
+        processed.sort((a, b) => {
+            if (a.points !== b.points) return b.points - a.points;
+            if (a.gd !== b.gd) return b.gd - a.gd;
+            return b.gf - a.gf;
+        });
+        return processed;
+    }
+    
+    // 渲染單個表格
+    function renderTable(tableId, teams) {
+        const tbody = document.querySelector(`#${tableId} tbody`);
+        if (!tbody) return;
+        
+        if (!teams || teams.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 30px;">暫無數據</td></tr>';
+            return;
+        }
+        
+        const standings = calculateAndSort(teams);
+        tbody.innerHTML = '';
+        
+        standings.forEach((team, idx) => {
+            const row = tbody.insertRow();
+            
+            // 排名
+            const rankCell = row.insertCell(0);
+            rankCell.textContent = idx + 1;
+            
+            // 球隊名稱
+            const nameCell = row.insertCell(1);
+            nameCell.textContent = team.name;
+            nameCell.className = 'team-name';
+            
+            // 其他數據
+            row.insertCell(2).textContent = team.played;
+            row.insertCell(3).textContent = team.win;
+            row.insertCell(4).textContent = team.draw;
+            row.insertCell(5).textContent = team.loss;
+            row.insertCell(6).textContent = team.gf;
+            row.insertCell(7).textContent = team.ga;
+            row.insertCell(8).textContent = team.gd;
+            row.insertCell(9).textContent = team.points;
+        });
+    }
+    
+    // 渲染所有組別
+    function renderAllTables(data) {
+        if (!data) return false;
+        
+        // 初級組
+        renderTable('junior-a-table', data.junior?.A);
+        renderTable('junior-b-table', data.junior?.B);
+        renderTable('junior-c-table', data.junior?.C);
+        
+        // 高級組
+        renderTable('senior-a-table', data.senior?.A);
+        renderTable('senior-b-table', data.senior?.B);
+        renderTable('senior-c-table', data.senior?.C);
+        
+        // 中年組
+        renderTable('middle-a-table', data.middle?.A);
+        renderTable('middle-b-table', data.middle?.B);
+        
+        // 元老組
+        renderTable('veteran-a-table', data.veteran?.A);
+        renderTable('veteran-b-table', data.veteran?.B);
+        
+        // 更新時間顯示
+        if (data.lastUpdated) {
+            const timeDisplay = document.getElementById('updateTimeDisplay');
+            if (timeDisplay) {
+                timeDisplay.innerHTML = `📅 最後更新：${data.lastUpdated}`;
+                timeDisplay.style.background = 'rgba(255,255,200,0.5)';
+                timeDisplay.style.color = '#5a3e1a';
+            }
+        }
+        
+        // 更新數據來源提示
+        const sourceInfo = document.getElementById('dataSourceInfo');
+        if (sourceInfo) {
+            sourceInfo.innerHTML = `✅ 數據庫連接成功 | 積分榜即時更新`;
+            sourceInfo.style.color = '#888';
+        }
+        
+        return true;
+    }
+    
+    // 加載數據（從外部JSON，失敗時只顯示錯誤）
+    async function loadAllData() {
+        const refreshBtn = document.getElementById('refreshDataBtn');
+        if (refreshBtn) {
+            refreshBtn.textContent = '🔄 載入中...';
+            refreshBtn.disabled = true;
+        }
+        
+        // 先顯示載入狀態
+        const tableIds = [
+            'junior-a-table', 'junior-b-table', 'junior-c-table',
+            'senior-a-table', 'senior-b-table', 'senior-c-table',
+            'middle-a-table', 'middle-b-table',
+            'veteran-a-table', 'veteran-b-table'
+        ];
+        tableIds.forEach(tableId => {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="10" class="loading">📡 正在連接數據庫...</td></tr>';
+            }
+        });
+        
+        const sourceInfo = document.getElementById('dataSourceInfo');
+        if (sourceInfo) {
+            sourceInfo.innerHTML = `🔄 正在連接數據庫...`;
+            sourceInfo.style.color = '#888';
+        }
+        
+        try {
+            // 嘗試從外部 JSON 加載數據
+            const response = await fetch(DATA_URL, {
+                cache: 'no-cache',
+                headers: { 'Cache-Control': 'no-cache' }
+            });
+            
+            if (response.ok) {
+                const jsonData = await response.json();
+                renderAllTables(jsonData);
+            } else {
+                throw new Error(`HTTP ${response.status}: 無法載入數據`);
+            }
+        } catch (error) {
+            console.error('數據庫連接失敗:', error.message);
+            showAllTablesError();
+        }
+        
+        if (refreshBtn) {
+            refreshBtn.textContent = '🔄 刷新數據';
+            refreshBtn.disabled = false;
+        }
+    }
+    
+    // 頁籤切換邏輯
+    function initTabs() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = tab.getAttribute('data-tab');
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                contents.forEach(content => content.classList.remove('active'));
+                const targetContent = document.getElementById(targetId);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
+        });
+    }
+    
+    // Modal 控制
+    function openModal() {
+        const modal = document.getElementById('official-modal');
+        if (modal) modal.style.display = 'flex';
+    }
+    
+    function closeModal() {
+        const modal = document.getElementById('official-modal');
+        if (modal) modal.style.display = 'none';
+    }
+    
+    // 點擊 modal 背景關閉
+    window.onclick = function(event) {
+        const modal = document.getElementById('official-modal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    };
+    
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+        initTabs();
+        loadAllData();
+        
+        // 將函數掛載到全局，供按鈕調用
+        window.loadAllData = loadAllData;
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+    });
+</script>
 </body>
 </html>
