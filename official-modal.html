@@ -1,7 +1,422 @@
-<!-- 官方資料 Modal（請將下方 raw.githubusercontent.com 連結中的 username/repo 改為您的實際路徑） -->
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>澳門工人飛雪杯2026 - 足球賽事系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'PingFang TC', 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3b 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 標題區 */
+        .header {
+            background: linear-gradient(135deg, #ffd966, #ffb347);
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        .header h1 {
+            font-size: 2rem;
+            color: #2c3e2f;
+            margin-bottom: 8px;
+        }
+        .header p {
+            color: #5a3e1a;
+            font-size: 1rem;
+        }
+        
+        /* 數據更新時間提示 */
+        .update-time {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #5a3e1a;
+            margin-top: 8px;
+            background: rgba(255,255,200,0.5);
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        /* 頁籤切換 */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+            justify-content: center;
+        }
+        .tab-btn {
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f5e6d3;
+            color: #5a3e1a;
+        }
+        .tab-btn.active {
+            background: #ffb347;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transform: scale(1.02);
+        }
+        .tab-btn:hover:not(.active) {
+            background: #ffe0b5;
+            transform: translateY(-2px);
+        }
+        
+        /* 刷新按鈕 */
+        .refresh-btn {
+            background: #ffb347;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 20px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 15px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .refresh-btn:hover {
+            background: #ff9f1a;
+            transform: scale(1.02);
+        }
+        .refresh-btn:active {
+            transform: scale(0.98);
+        }
+        
+        /* 加載狀態 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1rem;
+        }
+        
+        /* 錯誤提示 */
+        .error-message {
+            text-align: center;
+            padding: 60px 20px;
+            background: #fff5f5;
+            border-radius: 16px;
+            color: #d32f2f;
+            font-size: 1.1rem;
+            border: 1px solid #ffcdd2;
+        }
+        .error-message .error-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .error-message button {
+            margin-top: 20px;
+            padding: 10px 24px;
+            background: #ffb347;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* 內容區域 */
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 組別標題 */
+        .group-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff8c42;
+            border-left: 5px solid #ffb347;
+            padding-left: 15px;
+            margin: 20px 0 15px 0;
+        }
+        .group-title:first-of-type {
+            margin-top: 0;
+        }
+
+        /* 表格樣式 */
+        .standing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .standing-table th {
+            background: #2d5a3b;
+            color: white;
+            padding: 12px 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .standing-table td {
+            padding: 10px 6px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+        .standing-table tr:hover {
+            background: #fef7e0;
+        }
+        /* 出線資格：黃色底色 - 僅前兩名 */
+        .standing-table tr.qualified {
+            background-color: #fff3b0 !important;
+        }
+        .standing-table tr.qualified:hover {
+            background-color: #ffef9e !important;
+        }
+        
+        .team-name {
+            text-align: left;
+            font-weight: 500;
+            padding-left: 12px;
+        }
+        
+        /* 官方資料按鈕 */
+        .official-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ffb347;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .official-btn:hover {
+            background: #ff9f1a;
+            transform: scale(1.05);
+        }
+        
+        /* Modal 樣式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.2s ease;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .modal-content h2 {
+            color: #ff8c42;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ffd966;
+            padding-bottom: 8px;
+        }
+        .modal-content ul {
+            list-style: none;
+            padding: 0;
+        }
+        .modal-content li {
+            margin-bottom: 20px;
+        }
+        .modal-content img {
+            max-width: 100%;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .modal-content img:hover {
+            transform: scale(1.02);
+        }
+        .modal-content button {
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 30px;
+            background: #ffb347;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .standing-table th, .standing-table td {
+                padding: 8px 4px;
+                font-size: 0.7rem;
+            }
+            .group-title {
+                font-size: 1.2rem;
+            }
+            .tab-btn {
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+            .official-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+            .refresh-btn {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.8rem;
+        }
+        
+        /* 數據來源提示 */
+        .data-source {
+            font-size: 0.7rem;
+            color: #888;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        /* 錯誤狀態下的頁籤禁用 */
+        .tab-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>⚽ 澳門工人飛雪杯2026 ⚽</h1>
+        <p>積分榜 | 小組前兩名（黃色底色）獲得晉級資格</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-top: 10px;">
+            <span class="update-time" id="updateTimeDisplay">📅 等待載入數據...</span>
+            <button class="refresh-btn" id="refreshDataBtn" onclick="loadAllData()">🔄 刷新數據</button>
+        </div>
+    </div>
+    
+    <!-- 頁籤按鈕 -->
+    <div class="tabs" id="tabsContainer">
+        <button class="tab-btn active" data-tab="junior">🏆 初級組</button>
+        <button class="tab-btn" data-tab="senior">🏅 高級組</button>
+        <button class="tab-btn" data-tab="middle">🎯 中年組</button>
+        <button class="tab-btn" data-tab="veteran">⭐ 元老組</button>
+    </div>
+    
+    <!-- 初級組內容 -->
+    <div id="junior" class="tab-content active">
+        <div class="group-title">📌 初級組 A組</div>
+        <table class="standing-table" id="junior-a-table">
+            <thead>
+                <tr><th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>               </thead>
+            <tbody>                 <td colspan="10" class="loading">載入中...                 </tbody>
+         </table>
+        
+        <div class="group-title">📌 初級組 B組</div>
+        <table class="standing-table" id="junior-b-table">
+            <thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead>
+            <tbody>                 <td colspan="10" class="loading">載入中...                 </tbody>
+         </table>
+        
+        <div class="group-title">📌 初級組 C組</div>
+        <table class="standing-table" id="junior-c-table">
+            <thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead>
+            <tbody>                 <td colspan="10" class="loading">載入中...                 </tbody>
+         </table>
+    </div>
+    
+    <!-- 高級組內容 -->
+    <div id="senior" class="tab-content">
+        <div class="group-title">📌 高級組 A組</div>
+        <table class="standing-table" id="senior-a-table"><thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead><tbody>                 <td colspan="10" class="loading">載入中...                 </tbody></table>
+        <div class="group-title">📌 高級組 B組</div>
+        <table class="standing-table" id="senior-b-table"><thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead><tbody>                 <td colspan="10" class="loading">載入中...                 </tbody></table>
+        <div class="group-title">📌 高級組 C組</div>
+        <table class="standing-table" id="senior-c-table"><thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead><tbody>                 <td colspan="10" class="loading">載入中...                 </tbody></table>
+    </div>
+    
+    <!-- 中年組內容 -->
+    <div id="middle" class="tab-content">
+        <div class="group-title">📌 中年組 A組</div>
+        <table class="standing-table" id="middle-a-table"><thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead><tbody>                 <td colspan="10" class="loading">載入中...                 </tbody></table>
+        <div class="group-title">📌 中年組 B組</div>
+        <table class="standing-table" id="middle-b-table"><thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead><tbody>                 <td colspan="10" class="loading">載入中...                 </tbody></table>
+    </div>
+    
+    <!-- 元老組內容 -->
+    <div id="veteran" class="tab-content">
+        <div class="group-title">📌 元老組 A組</div>
+        <table class="standing-table" id="veteran-a-table"><thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead><tbody>                 <td colspan="10" class="loading">載入中...                 </tbody></table>
+        <div class="group-title">📌 元老組 B組</div>
+        <table class="standing-table" id="veteran-b-table"><thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead><tbody>                 <td colspan="10" class="loading">載入中...                 </tbody></table>
+    </div>
+    
+    <div class="footer">
+        <p>※ 小組排名前兩名（黃色底色）獲得晉級資格 | 數據來源：外部數據庫</p>
+        <p class="data-source" id="dataSourceInfo">📊 正在連接數據庫...</p>
+    </div>
+</div>
+
+<button class="official-btn" onclick="openModal()">📄 官方資料</button>
+
+<!-- 官方資料 Modal -->
 <div id="official-modal" class="modal" style="display:none;">
     <div class="modal-content" style="max-height:80vh; overflow-y:auto;">
-        <h2>官方資料</h2>
+        <h2>📋 官方資料</h2>
         <p>點擊圖片可查看原始大圖或下載：</p>
         <ul style="list-style:none; padding:0;">
             <li style="margin-bottom:20px;">
@@ -24,6 +439,266 @@
             </li>
         </ul>
         <p style="margin-top:20px;">※ 若圖片無法顯示，請確認 GitHub 倉庫是否公開，且路徑正確。</p>
-        <button onclick="closeModal('official-modal')">關閉</button>
+        <button onclick="closeModal()">關閉</button>
     </div>
 </div>
+
+<script>
+    // ====================== 動態數據加載 ======================
+    // 數據可通過外部 JSON 檔案更新，只需修改下方的 DATA_URL
+    // 當無法連接數據庫時，只顯示錯誤訊息，不載入默認數據
+    
+    // 數據檔案路徑（請根據實際情況修改）
+    const DATA_URL = './data/standings.json';  // 可修改為實際 API 或 JSON 路徑
+    
+    let dataLoadFailed = false;
+    
+    // 顯示所有表格的錯誤訊息
+    function showAllTablesError() {
+        const tableIds = [
+            'junior-a-table', 'junior-b-table', 'junior-c-table',
+            'senior-a-table', 'senior-b-table', 'senior-c-table',
+            'middle-a-table', 'middle-b-table',
+            'veteran-a-table', 'veteran-b-table'
+        ];
+        
+        tableIds.forEach(tableId => {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            if (tbody) {
+                tbody.innerHTML = `                     <td colspan="10" style="text-align:center; padding: 40px; color: #d32f2f;">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">⚠️</div>
+                        <div>無法連接數據庫</div>
+                        <div style="font-size: 0.8rem; margin-top: 8px;">請檢查網絡連接或稍後再試</div>
+                     </td>`;
+            }
+        });
+        
+        // 更新數據來源提示
+        const sourceInfo = document.getElementById('dataSourceInfo');
+        if (sourceInfo) {
+            sourceInfo.innerHTML = `❌ 數據庫連接失敗 - 無法載入積分榜數據`;
+            sourceInfo.style.color = '#d32f2f';
+        }
+        
+        const timeDisplay = document.getElementById('updateTimeDisplay');
+        if (timeDisplay) {
+            timeDisplay.innerHTML = `⚠️ 無法連接數據庫`;
+            timeDisplay.style.background = '#ffebee';
+            timeDisplay.style.color = '#d32f2f';
+        }
+        
+        // 禁用頁籤切換（可選，保持可用但顯示無數據）
+        const tabs = document.querySelectorAll('.tab-btn');
+        tabs.forEach(tab => {
+            // 不禁用，讓用戶可以切換，但內容都是錯誤訊息
+        });
+    }
+    
+    // 渲染單個表格，為前兩名添加 qualified class (黃色底色)
+    function renderTable(tableId, teams) {
+        const tbody = document.querySelector(`#${tableId} tbody`);
+        if (!tbody) return;
+        
+        if (!teams || teams.length === 0) {
+            tbody.innerHTML = '                     <td colspan="10" style="text-align:center; padding: 30px;">暫無數據</td>';
+            return;
+        }
+        
+        // 計算積分、淨勝球，並排序
+        const processed = teams.map(t => ({
+            ...t,
+            points: t.win * 3 + t.draw * 1,
+            gd: t.gf - t.ga
+        }));
+        processed.sort((a, b) => {
+            if (a.points !== b.points) return b.points - a.points;
+            if (a.gd !== b.gd) return b.gd - a.gd;
+            return b.gf - a.gf;
+        });
+        
+        tbody.innerHTML = '';
+        processed.forEach((team, idx) => {
+            const row = tbody.insertRow();
+            // 排名前兩名添加 qualified class（黃色底色）
+            if (idx === 0 || idx === 1) {
+                row.classList.add('qualified');
+            }
+            
+            const rankCell = row.insertCell(0);
+            rankCell.textContent = idx + 1;
+            rankCell.style.fontWeight = idx < 2 ? 'bold' : 'normal';
+            
+            const nameCell = row.insertCell(1);
+            nameCell.textContent = team.name;
+            nameCell.className = 'team-name';
+            
+            row.insertCell(2).textContent = team.played;
+            row.insertCell(3).textContent = team.win;
+            row.insertCell(4).textContent = team.draw;
+            row.insertCell(5).textContent = team.loss;
+            row.insertCell(6).textContent = team.gf;
+            row.insertCell(7).textContent = team.ga;
+            row.insertCell(8).textContent = team.gd;
+            row.insertCell(9).textContent = team.points;
+            
+            if (idx < 2) {
+                row.cells[9].style.fontWeight = 'bold';
+                row.cells[8].style.fontWeight = 'bold';
+            }
+        });
+    }
+    
+    // 渲染所有組別
+    function renderAllTables(data) {
+        if (!data) return;
+        
+        // 初級組
+        renderTable('junior-a-table', data.junior?.A);
+        renderTable('junior-b-table', data.junior?.B);
+        renderTable('junior-c-table', data.junior?.C);
+        
+        // 高級組
+        renderTable('senior-a-table', data.senior?.A);
+        renderTable('senior-b-table', data.senior?.B);
+        renderTable('senior-c-table', data.senior?.C);
+        
+        // 中年組
+        renderTable('middle-a-table', data.middle?.A);
+        renderTable('middle-b-table', data.middle?.B);
+        
+        // 元老組
+        renderTable('veteran-a-table', data.veteran?.A);
+        renderTable('veteran-b-table', data.veteran?.B);
+        
+        // 更新時間顯示
+        if (data.lastUpdated) {
+            const timeDisplay = document.getElementById('updateTimeDisplay');
+            if (timeDisplay) {
+                timeDisplay.innerHTML = `📅 最後更新：${data.lastUpdated}`;
+                timeDisplay.style.background = 'rgba(255,255,200,0.5)';
+                timeDisplay.style.color = '#5a3e1a';
+            }
+        }
+        
+        // 更新數據來源提示
+        const sourceInfo = document.getElementById('dataSourceInfo');
+        if (sourceInfo) {
+            sourceInfo.innerHTML = `✅ 數據庫連接成功 | 積分榜即時更新`;
+            sourceInfo.style.color = '#888';
+        }
+        
+        dataLoadFailed = false;
+    }
+    
+    // 加載數據（從外部JSON，失敗時只顯示錯誤，不加載默認數據）
+    async function loadAllData() {
+        const refreshBtn = document.getElementById('refreshDataBtn');
+        if (refreshBtn) {
+            refreshBtn.textContent = '🔄 載入中...';
+            refreshBtn.disabled = true;
+        }
+        
+        // 先顯示載入狀態
+        const tableIds = [
+            'junior-a-table', 'junior-b-table', 'junior-c-table',
+            'senior-a-table', 'senior-b-table', 'senior-c-table',
+            'middle-a-table', 'middle-b-table',
+            'veteran-a-table', 'veteran-b-table'
+        ];
+        tableIds.forEach(tableId => {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="10" class="loading">📡 正在連接數據庫...</td></tr>';
+            }
+        });
+        
+        const sourceInfo = document.getElementById('dataSourceInfo');
+        if (sourceInfo) {
+            sourceInfo.innerHTML = `🔄 正在連接數據庫...`;
+            sourceInfo.style.color = '#888';
+        }
+        
+        try {
+            // 嘗試從外部 JSON 加載數據
+            const response = await fetch(DATA_URL, {
+                cache: 'no-cache',
+                headers: { 'Cache-Control': 'no-cache' }
+            });
+            
+            if (response.ok) {
+                const jsonData = await response.json();
+                renderAllTables(jsonData);
+                
+                // 更新數據來源提示
+                if (sourceInfo) {
+                    sourceInfo.innerHTML = `✅ 數據庫連接成功 | 積分榜即時更新`;
+                    sourceInfo.style.color = '#888';
+                }
+            } else {
+                throw new Error(`HTTP ${response.status}: 無法載入數據`);
+            }
+        } catch (error) {
+            console.error('數據庫連接失敗:', error.message);
+            // 只顯示錯誤訊息，不加載默認數據
+            showAllTablesError();
+        }
+        
+        if (refreshBtn) {
+            refreshBtn.textContent = '🔄 刷新數據';
+            refreshBtn.disabled = false;
+        }
+    }
+    
+    // 頁籤切換邏輯
+    function initTabs() {
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetId = tab.getAttribute('data-tab');
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                contents.forEach(content => content.classList.remove('active'));
+                const targetContent = document.getElementById(targetId);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            });
+        });
+    }
+    
+    // Modal 控制
+    function openModal() {
+        const modal = document.getElementById('official-modal');
+        if (modal) modal.style.display = 'flex';
+    }
+    
+    function closeModal() {
+        const modal = document.getElementById('official-modal');
+        if (modal) modal.style.display = 'none';
+    }
+    
+    // 點擊 modal 背景關閉
+    window.onclick = function(event) {
+        const modal = document.getElementById('official-modal');
+        if (event.target === modal) {
+            closeModal();
+        }
+    };
+    
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+        initTabs();
+        loadAllData();
+        
+        // 將函數掛載到全局，供按鈕調用
+        window.loadAllData = loadAllData;
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+    });
+</script>
+</body>
+</html>
