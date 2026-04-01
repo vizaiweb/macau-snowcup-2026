@@ -329,20 +329,13 @@
             text-align: center;
             margin-top: 10px;
         }
-        
-        /* 錯誤狀態下的頁籤禁用 */
-        .tab-btn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
         <h1>⚽ 澳門工人飛雪杯2026 ⚽</h1>
-        <p>積分榜 | 小組前兩名（黃色底色）獲得晉級資格</p>
+        <p>積分榜 | 小組前兩名（<span style="background:#fff3b0; padding:2px 8px; border-radius:15px;">黃色底色</span>）獲得晉級資格</p>
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-top: 10px;">
             <span class="update-time" id="updateTimeDisplay">📅 等待載入數據...</span>
             <button class="refresh-btn" id="refreshDataBtn" onclick="loadAllData()">🔄 刷新數據</button>
@@ -364,19 +357,19 @@
             <thead>
                 <tr><th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>               </thead>
             <tbody>                 <td colspan="10" class="loading">載入中...                 </tbody>
-         </table>
+          </table>
         
         <div class="group-title">📌 初級組 B組</div>
         <table class="standing-table" id="junior-b-table">
             <thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead>
             <tbody>                 <td colspan="10" class="loading">載入中...                 </tbody>
-         </table>
+          </table>
         
         <div class="group-title">📌 初級組 C組</div>
         <table class="standing-table" id="junior-c-table">
             <thead>                 <th>排名</th><th>球隊</th><th>賽</th><th>勝</th><th>和</th><th>負</th><th>得球</th><th>失球</th><th>淨勝球</th><th>積分</th>             </thead>
             <tbody>                 <td colspan="10" class="loading">載入中...                 </tbody>
-         </table>
+          </table>
     </div>
     
     <!-- 高級組內容 -->
@@ -445,11 +438,8 @@
 
 <script>
     // ====================== 動態數據加載 ======================
-    // 數據可通過外部 JSON 檔案更新，只需修改下方的 DATA_URL
-    // 當無法連接數據庫時，只顯示錯誤訊息，不載入默認數據
-    
-    // 數據檔案路徑（請根據實際情況修改）
-    const DATA_URL = './data/standings.json';  // 可修改為實際 API 或 JSON 路徑
+    // 數據可通過外部 JSON 檔案更新
+    const DATA_URL = './data/standings.json';
     
     let dataLoadFailed = false;
     
@@ -469,11 +459,10 @@
                         <div style="font-size: 2rem; margin-bottom: 10px;">⚠️</div>
                         <div>無法連接數據庫</div>
                         <div style="font-size: 0.8rem; margin-top: 8px;">請檢查網絡連接或稍後再試</div>
-                     </td>`;
+                      </td>`;
             }
         });
         
-        // 更新數據來源提示
         const sourceInfo = document.getElementById('dataSourceInfo');
         if (sourceInfo) {
             sourceInfo.innerHTML = `❌ 數據庫連接失敗 - 無法載入積分榜數據`;
@@ -487,11 +476,23 @@
             timeDisplay.style.color = '#d32f2f';
         }
         
-        // 禁用頁籤切換（可選，保持可用但顯示無數據）
-        const tabs = document.querySelectorAll('.tab-btn');
-        tabs.forEach(tab => {
-            // 不禁用，讓用戶可以切換，但內容都是錯誤訊息
+        dataLoadFailed = true;
+    }
+    
+    // 計算積分、淨勝球，並排序（重要：確保排序正確）
+    function calculateAndSort(teams) {
+        const processed = teams.map(t => ({
+            ...t,
+            points: t.win * 3 + t.draw * 1,
+            gd: t.gf - t.ga
+        }));
+        // 排序規則：積分 > 淨勝球 > 得球
+        processed.sort((a, b) => {
+            if (a.points !== b.points) return b.points - a.points;
+            if (a.gd !== b.gd) return b.gd - a.gd;
+            return b.gf - a.gf;
         });
+        return processed;
     }
     
     // 渲染單個表格，為前兩名添加 qualified class (黃色底色)
@@ -500,38 +501,33 @@
         if (!tbody) return;
         
         if (!teams || teams.length === 0) {
-            tbody.innerHTML = '                     <td colspan="10" style="text-align:center; padding: 30px;">暫無數據</td>';
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 30px;">暫無數據</td></tr>';
             return;
         }
         
-        // 計算積分、淨勝球，並排序
-        const processed = teams.map(t => ({
-            ...t,
-            points: t.win * 3 + t.draw * 1,
-            gd: t.gf - t.ga
-        }));
-        processed.sort((a, b) => {
-            if (a.points !== b.points) return b.points - a.points;
-            if (a.gd !== b.gd) return b.gd - a.gd;
-            return b.gf - a.gf;
-        });
-        
+        const standings = calculateAndSort(teams);
         tbody.innerHTML = '';
-        processed.forEach((team, idx) => {
+        
+        standings.forEach((team, idx) => {
             const row = tbody.insertRow();
-            // 排名前兩名添加 qualified class（黃色底色）
+            
+            // 排名前兩名添加 qualified class（黃色底色）- 關鍵修正
             if (idx === 0 || idx === 1) {
                 row.classList.add('qualified');
             }
             
+            // 排名
             const rankCell = row.insertCell(0);
             rankCell.textContent = idx + 1;
             rankCell.style.fontWeight = idx < 2 ? 'bold' : 'normal';
             
+            // 球隊名稱
             const nameCell = row.insertCell(1);
             nameCell.textContent = team.name;
             nameCell.className = 'team-name';
+            if (idx < 2) nameCell.style.fontWeight = 'bold';
             
+            // 其他數據
             row.insertCell(2).textContent = team.played;
             row.insertCell(3).textContent = team.win;
             row.insertCell(4).textContent = team.draw;
@@ -541,16 +537,17 @@
             row.insertCell(8).textContent = team.gd;
             row.insertCell(9).textContent = team.points;
             
+            // 前兩名加粗積分和淨勝球
             if (idx < 2) {
-                row.cells[9].style.fontWeight = 'bold';
                 row.cells[8].style.fontWeight = 'bold';
+                row.cells[9].style.fontWeight = 'bold';
             }
         });
     }
     
     // 渲染所有組別
     function renderAllTables(data) {
-        if (!data) return;
+        if (!data) return false;
         
         // 初級組
         renderTable('junior-a-table', data.junior?.A);
@@ -583,14 +580,15 @@
         // 更新數據來源提示
         const sourceInfo = document.getElementById('dataSourceInfo');
         if (sourceInfo) {
-            sourceInfo.innerHTML = `✅ 數據庫連接成功 | 積分榜即時更新`;
+            sourceInfo.innerHTML = `✅ 數據庫連接成功 | 積分榜即時更新 (前兩名黃色底色)`;
             sourceInfo.style.color = '#888';
         }
         
         dataLoadFailed = false;
+        return true;
     }
     
-    // 加載數據（從外部JSON，失敗時只顯示錯誤，不加載默認數據）
+    // 加載數據（從外部JSON，失敗時只顯示錯誤）
     async function loadAllData() {
         const refreshBtn = document.getElementById('refreshDataBtn');
         if (refreshBtn) {
@@ -628,18 +626,11 @@
             if (response.ok) {
                 const jsonData = await response.json();
                 renderAllTables(jsonData);
-                
-                // 更新數據來源提示
-                if (sourceInfo) {
-                    sourceInfo.innerHTML = `✅ 數據庫連接成功 | 積分榜即時更新`;
-                    sourceInfo.style.color = '#888';
-                }
             } else {
                 throw new Error(`HTTP ${response.status}: 無法載入數據`);
             }
         } catch (error) {
             console.error('數據庫連接失敗:', error.message);
-            // 只顯示錯誤訊息，不加載默認數據
             showAllTablesError();
         }
         
